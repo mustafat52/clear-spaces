@@ -31,7 +31,7 @@ export default function PatientLogin() {
           setBusy(false);
           return;
         }
-        const { error: signUpError } = await signUpPatient({
+        const { data: signUpData, error: signUpError } = await signUpPatient({
           email: form.email.trim(),
           password: form.password,
           fullName: form.fullName.trim(),
@@ -39,6 +39,13 @@ export default function PatientLogin() {
         });
         if (signUpError) {
           setError(signUpError.message);
+        } else if (!signUpData?.session) {
+          // Email confirmation is required — no session yet, so there's
+          // nothing to route to. Tell the user instead of silently
+          // bouncing them to the login form.
+          setInfo("Account created! Check your inbox for a confirmation email, then log in below.");
+          setMode("signin");
+          setForm((f) => ({ ...f, password: "" }));
         } else {
           navigate(from, { replace: true });
         }

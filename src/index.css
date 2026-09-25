@@ -987,6 +987,137 @@ img {
   color: var(--text-muted);
 }
 
+/* ---------------- MOBILE NAV ---------------- */
+.cs-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--navy);
+  padding: 6px;
+}
+.cs-mobile-menu {
+  position: fixed;
+  inset: 0;
+  top: 74px;
+  background: var(--cream);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 28px;
+  gap: 4px;
+}
+.cs-mobile-menu a,
+.cs-mobile-menu button {
+  display: block;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--navy);
+  text-decoration: none;
+  font-size: 15px;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: "Work Sans", sans-serif;
+}
+
+/* ---------------- AUTH PAGES ---------------- */
+.cs-auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: linear-gradient(160deg, var(--sky-mist), var(--cream) 55%);
+}
+.cs-auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px 32px;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 50px rgba(12, 43, 89, 0.08);
+}
+.cs-auth-title {
+  font-family: "Fraunces", serif;
+  font-weight: 500;
+  font-size: 23px;
+  color: var(--navy);
+  text-align: center;
+  margin: 0 0 8px;
+}
+.cs-auth-sub {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 0 24px;
+  line-height: 1.55;
+}
+.cs-auth-switch {
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin-top: 18px;
+}
+.cs-auth-switch button {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13.5px;
+  padding: 0;
+}
+.cs-auth-back {
+  display: block;
+  text-align: center;
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+.cs-auth-back:hover {
+  color: var(--navy);
+}
+.cs-error-box {
+  background: rgba(226, 75, 74, 0.1);
+  border: 1px solid rgba(226, 75, 74, 0.3);
+  color: #8a2323;
+  font-size: 13px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ---------------- SHARED NOTES (patient dashboard) ---------------- */
+.cs-shared-note {
+  font-size: 13px;
+  color: var(--navy);
+  background: var(--sky-mist);
+  border: 1px solid rgba(1, 177, 253, 0.2);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  line-height: 1.55;
+}
+
+/* ---------------- PATIENTS LIST ---------------- */
+.cs-patient-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.cs-patient-row:hover {
+  border-color: var(--sky);
+}
+
 /* ---------------- RESPONSIVE ---------------- */
 @media (max-width: 860px) {
   .cs-hero-inner,
@@ -1006,6 +1137,12 @@ img {
     grid-template-columns: 1fr;
   }
   .cs-nav-links {
+    display: none;
+  }
+  .cs-hamburger {
+    display: block;
+  }
+  .cs-nav > div:last-child > .cs-btn-ghost {
     display: none;
   }
   .cs-section {

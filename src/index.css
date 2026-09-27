@@ -109,6 +109,11 @@ img {
 .cs-btn:active {
   transform: translateY(1px);
 }
+a.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
 .cs-btn-amber {
   background: var(--amber);
   color: #33240a;
@@ -961,6 +966,36 @@ img {
   display: flex;
   gap: 10px;
   margin-top: 16px;
+  flex-wrap: wrap;
+}
+.cs-wa-box {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+.cs-wa-box label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.cs-wa-box textarea {
+  width: 100%;
+  border: 1.4px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 13px;
+  font-family: "Work Sans", sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  background: #fff;
+  color: var(--text);
+  margin-bottom: 12px;
+  resize: vertical;
+}
+.cs-wa-box textarea:focus {
+  outline: 2px solid var(--sky);
+  outline-offset: 1px;
+  border-color: var(--sky);
 }
 .cs-type-pill {
   font-size: 11px;
@@ -1083,6 +1118,16 @@ img {
 }
 .cs-auth-back:hover {
   color: var(--navy);
+}
+.cs-forgot-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--blue);
+  text-decoration: none;
+}
+.cs-forgot-link:hover {
+  text-decoration: underline;
 }
 .cs-error-box {
   background: rgba(226, 75, 74, 0.1);

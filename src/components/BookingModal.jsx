@@ -60,22 +60,29 @@ export default function BookingModal({ onClose, initialType }) {
   const visibleDays = sessionType === "urgent" ? days.slice(0, 2) : days;
   const amount = sessionType === "urgent" ? 4500 : 1500;
 
-  useEffect(() => {
-    if (step !== 2) return;
+  async function loadTakenSlots() {
     setLoadingSlots(true);
     const from = toISODate(days[0]);
     const to = toISODate(days[days.length - 1]);
-    fetchTakenSlots(from, to)
-      .then((rows) => {
-        const map = {};
-        rows.forEach((r) => {
-          map[`${r.session_date}-${r.time_slot}`] = true;
-        });
-        setTaken(map);
-      })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoadingSlots(false));
-  }, [step, days]);
+    try {
+      const rows = await fetchTakenSlots(from, to);
+      const map = {};
+      rows.forEach((r) => {
+        map[`${r.session_date}-${r.time_slot}`] = true;
+      });
+      setTaken(map);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoadingSlots(false);
+    }
+  }
+
+  useEffect(() => {
+    if (step !== 2) return;
+    loadTakenSlots();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   function isTaken(idx, timeLabel) {
     return !!taken[`${toISODate(visibleDays[idx])}-${timeLabel}`];
@@ -96,7 +103,16 @@ export default function BookingModal({ onClose, initialType }) {
       });
       setDone(b);
     } catch (e) {
-      setError(e.message || "Something went wrong submitting your request.");
+      if (e.code === "23505") {
+        // The database's unique index caught a collision — someone else
+        // booked this exact slot in the moments since we last checked.
+        setError("Someone just booked this exact slot. Pick another time below.");
+        setTimeIdx(null);
+        setStep(2);
+        loadTakenSlots();
+      } else {
+        setError(e.message || "Something went wrong submitting your request.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -208,7 +224,12 @@ export default function BookingModal({ onClose, initialType }) {
                       <div
                         key={t}
                         className={`cs-time-slot ${timeIdx === i ? "selected" : ""} ${takenSlot ? "booked" : ""}`}
-                        onClick={() => !takenSlot && setTimeIdx(i)}
+                        onClick={() => {
+                          if (!takenSlot) {
+                            setTimeIdx(i);
+                            setError("");
+                          }
+                        }}
                       >
                         <Clock size={12} style={{ verticalAlign: "-1px", marginRight: 5 }} />
                         {t}

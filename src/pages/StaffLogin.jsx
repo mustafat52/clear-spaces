@@ -62,6 +62,9 @@ export default function StaffLogin() {
           <div className="cs-field">
             <label>Password</label>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" />
+            <Link to="/forgot-password" className="cs-forgot-link">
+              Forgot password?
+            </Link>
           </div>
           <button className="cs-btn cs-btn-blue cs-btn-full" type="submit" disabled={busy}>
             {busy ? "Please wait…" : "Log in"}

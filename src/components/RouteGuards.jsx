@@ -14,8 +14,8 @@ export function RequireStaff({ children }) {
   const { session, profile, loading, isStaff } = useAuth();
   const location = useLocation();
   if (loading) return <FullPageLoader />;
-  if (!session) return <Navigate to="/staff/login" state={{ from: location }} replace />;
-  if (!isStaff) return <Navigate to="/staff/login" state={{ notStaff: true }} replace />;
+  if (!session) return <Navigate to="/manager/login" state={{ from: location }} replace />;
+  if (!isStaff) return <Navigate to="/manager/login" state={{ notStaff: true }} replace />;
   return children;
 }
 

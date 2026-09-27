@@ -266,7 +266,7 @@ export default function Landing() {
           </div>
           <div className="cs-footer-bottom">
             <span>© {new Date().getFullYear()} ClearSpaces. All rights reserved.</span>
-            <a className="cs-team-link" href="/staff/login">
+            <a className="cs-team-link" href="/manager/login">
               <LayoutDashboard size={13} /> Team login
             </a>
           </div>

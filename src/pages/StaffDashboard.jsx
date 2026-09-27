@@ -8,6 +8,7 @@ import {
   Users,
   Phone,
   ChevronRight,
+  MessageCircle,
 } from "lucide-react";
 import Logo from "../components/Logo";
 import { useAuth } from "../lib/auth";
@@ -24,6 +25,7 @@ import {
   fetchPatientSessions,
 } from "../lib/data";
 import { TIMES, DAY_COUNT, getDays, toISODate, fmtDayLong, STATUS_LABEL } from "../lib/dates";
+import { buildWaLink, buildConfirmMessage, buildDeclineMessage } from "../lib/whatsapp";
 
 export default function StaffDashboard() {
   const { session, profile, signOut } = useAuth();
@@ -88,6 +90,11 @@ export default function StaffDashboard() {
 function RequestsTab() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  // Lifted up here (not into each card) so the editable draft and whether
+  // the WhatsApp box is open survive a card moving from "Needs a decision"
+  // into "Already decided" right after Confirm/Decline.
+  const [drafts, setDrafts] = useState({});
+  const [openIds, setOpenIds] = useState({});
 
   useEffect(() => {
     load();
@@ -103,9 +110,25 @@ function RequestsTab() {
     }
   }
 
-  async function decide(id, status) {
-    await updateSessionStatus(id, status);
-    load();
+  async function decide(b, status) {
+    await updateSessionStatus(b.id, status);
+    const template = status === "confirmed" ? buildConfirmMessage(b) : buildDeclineMessage(b);
+    setDrafts((d) => ({ ...d, [b.id]: template }));
+    setOpenIds((o) => ({ ...o, [b.id]: true }));
+    // update in place rather than a full reload, so the card doesn't
+    // flicker and the draft above stays attached to the right session
+    setSessions((rows) => rows.map((r) => (r.id === b.id ? { ...r, status } : r)));
+  }
+
+  function toggleEditor(b) {
+    setOpenIds((o) => {
+      const willOpen = !o[b.id];
+      if (willOpen && !drafts[b.id]) {
+        const template = b.status === "confirmed" ? buildConfirmMessage(b) : buildDeclineMessage(b);
+        setDrafts((d) => ({ ...d, [b.id]: template }));
+      }
+      return { ...o, [b.id]: willOpen };
+    });
   }
 
   const pending = sessions.filter((s) => s.status === "pending");
@@ -118,29 +141,16 @@ function RequestsTab() {
       <h4 className="cs-admin-section-title">Needs a decision ({pending.length})</h4>
       {pending.length === 0 && <p className="cs-admin-empty">Nothing pending right now.</p>}
       {pending.map((b) => (
-        <div className="cs-req-card" key={b.id}>
-          <div className="cs-req-top">
-            <div>
-              <b>{b.patient?.full_name || "Unknown"}</b>
-              <span className={`cs-type-pill ${b.type}`}>{b.type === "urgent" ? "Urgent" : "Regular"}</span>
-            </div>
-            <span className="cs-req-amt">₹{b.amount.toLocaleString("en-IN")}</span>
-          </div>
-          <div className="cs-req-meta">
-            {fmtDayLong(b.session_date)} · {b.time_slot} · {b.patient?.phone}
-            {b.patient?.email ? ` · ${b.patient.email}` : ""}
-          </div>
-          {b.txn_ref && <div className="cs-req-meta">Txn ref: {b.txn_ref}</div>}
-          {b.client_notes && <div className="cs-req-notes">"{b.client_notes}"</div>}
-          <div className="cs-req-actions">
-            <button className="cs-btn cs-btn-light" onClick={() => decide(b.id, "declined")}>
-              Decline
-            </button>
-            <button className="cs-btn cs-btn-blue" onClick={() => decide(b.id, "confirmed")}>
-              Confirm session
-            </button>
-          </div>
-        </div>
+        <RequestCard
+          key={b.id}
+          b={b}
+          draft={drafts[b.id]}
+          open={!!openIds[b.id]}
+          onConfirm={() => decide(b, "confirmed")}
+          onDecline={() => decide(b, "declined")}
+          onToggleEditor={() => toggleEditor(b)}
+          onDraftChange={(text) => setDrafts((d) => ({ ...d, [b.id]: text }))}
+        />
       ))}
 
       <h4 className="cs-admin-section-title" style={{ marginTop: 28 }}>
@@ -148,19 +158,82 @@ function RequestsTab() {
       </h4>
       {decided.length === 0 && <p className="cs-admin-empty">No history yet.</p>}
       {decided.map((b) => (
-        <div className="cs-req-card quiet" key={b.id}>
-          <div className="cs-req-top">
-            <div>
-              <b>{b.patient?.full_name || "Unknown"}</b>
-              <span className={`cs-type-pill ${b.type}`}>{b.type === "urgent" ? "Urgent" : "Regular"}</span>
-            </div>
-            <span className={`cs-status-pill ${b.status}`}>{STATUS_LABEL[b.status]}</span>
-          </div>
-          <div className="cs-req-meta">
-            {fmtDayLong(b.session_date)} · {b.time_slot} · {b.patient?.phone}
-          </div>
-        </div>
+        <RequestCard
+          key={b.id}
+          b={b}
+          quiet
+          draft={drafts[b.id]}
+          open={!!openIds[b.id]}
+          onToggleEditor={() => toggleEditor(b)}
+          onDraftChange={(text) => setDrafts((d) => ({ ...d, [b.id]: text }))}
+        />
       ))}
+    </div>
+  );
+}
+
+function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEditor, onDraftChange }) {
+  const phone = b.patient?.phone;
+  const plainWaLink = buildWaLink(phone);
+
+  function sendViaWhatsApp() {
+    window.open(buildWaLink(phone, draft || ""), "_blank", "noopener,noreferrer");
+  }
+
+  return (
+    <div className={`cs-req-card ${quiet ? "quiet" : ""}`}>
+      <div className="cs-req-top">
+        <div>
+          <b>{b.patient?.full_name || "Unknown"}</b>
+          <span className={`cs-type-pill ${b.type}`}>{b.type === "urgent" ? "Urgent" : "Regular"}</span>
+        </div>
+        {b.status === "pending" ? (
+          <span className="cs-req-amt">₹{b.amount.toLocaleString("en-IN")}</span>
+        ) : (
+          <span className={`cs-status-pill ${b.status}`}>{STATUS_LABEL[b.status]}</span>
+        )}
+      </div>
+      <div className="cs-req-meta">
+        {fmtDayLong(b.session_date)} · {b.time_slot} · {phone}
+        {b.patient?.email ? ` · ${b.patient.email}` : ""}
+      </div>
+      {b.txn_ref && <div className="cs-req-meta">Txn ref: {b.txn_ref}</div>}
+      {b.client_notes && <div className="cs-req-notes">"{b.client_notes}"</div>}
+
+      <div className="cs-req-actions">
+        {phone && (
+          <a className="cs-btn cs-btn-light" href={plainWaLink} target="_blank" rel="noopener noreferrer">
+            <MessageCircle size={14} style={{ verticalAlign: "-2px", marginRight: 6 }} />
+            Message on WhatsApp
+          </a>
+        )}
+        {b.status === "pending" && (
+          <>
+            <button className="cs-btn cs-btn-light" onClick={onDecline}>
+              Decline
+            </button>
+            <button className="cs-btn cs-btn-blue" onClick={onConfirm}>
+              Confirm session
+            </button>
+          </>
+        )}
+        {b.status !== "pending" && phone && (
+          <button className="cs-btn cs-btn-light" onClick={onToggleEditor}>
+            {open ? "Hide message" : "Prepare WhatsApp message"}
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <div className="cs-wa-box">
+          <label>Edit before sending — fill in Mr./Ms. and adjust as needed</label>
+          <textarea rows={7} value={draft || ""} onChange={(e) => onDraftChange(e.target.value)} />
+          <button className="cs-btn cs-btn-blue" onClick={sendViaWhatsApp} disabled={!phone}>
+            <MessageCircle size={14} style={{ verticalAlign: "-2px", marginRight: 6 }} />
+            Send via WhatsApp
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ import PatientLogin from "./pages/PatientLogin";
 import PatientDashboard from "./pages/PatientDashboard";
 import StaffLogin from "./pages/StaffLogin";
 import StaffDashboard from "./pages/StaffDashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 export default function App() {
   if (!supabaseConfigured) {
@@ -22,6 +24,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<PatientLogin />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route
             path="/dashboard"
             element={
@@ -30,7 +34,7 @@ export default function App() {
               </RequirePatient>
             }
           />
-          <Route path="/staff/login" element={<StaffLogin />} />
+          <Route path="/manager/login" element={<StaffLogin />} />
           <Route
             path="/staff"
             element={

@@ -31,7 +31,7 @@ export default function PatientLogin() {
           setBusy(false);
           return;
         }
-        const { data: signUpData, error: signUpError } = await signUpPatient({
+        const { error: signUpError } = await signUpPatient({
           email: form.email.trim(),
           password: form.password,
           fullName: form.fullName.trim(),
@@ -39,13 +39,6 @@ export default function PatientLogin() {
         });
         if (signUpError) {
           setError(signUpError.message);
-        } else if (!signUpData?.session) {
-          // Email confirmation is required — no session yet, so there's
-          // nothing to route to. Tell the user instead of silently
-          // bouncing them to the login form.
-          setInfo("Account created! Check your inbox for a confirmation email, then log in below.");
-          setMode("signin");
-          setForm((f) => ({ ...f, password: "" }));
         } else {
           navigate(from, { replace: true });
         }
@@ -103,6 +96,11 @@ export default function PatientLogin() {
               onChange={(e) => update("password", e.target.value)}
               placeholder={mode === "signup" ? "At least 6 characters" : "Your password"}
             />
+            {mode === "signin" && (
+              <Link to="/forgot-password" className="cs-forgot-link">
+                Forgot password?
+              </Link>
+            )}
           </div>
           <button className="cs-btn cs-btn-amber cs-btn-full" type="submit" disabled={busy}>
             {busy ? "Please wait…" : mode === "signin" ? "Log in" : "Create account"}

@@ -10,10 +10,8 @@ export default function Landing() {
   const { session } = useAuth();
   const navigate = useNavigate();
   const [showBooking, setShowBooking] = useState(false);
-  const [pendingType, setPendingType] = useState(null);
 
-  function openBooking(type) {
-    setPendingType(type || null);
+  function openBooking() {
     if (!session) {
       navigate("/login", { state: { from: { pathname: "/" } } });
       return;
@@ -23,7 +21,7 @@ export default function Landing() {
 
   return (
     <>
-      <SiteNav onBook={() => openBooking(null)} />
+      <SiteNav onBook={openBooking} />
 
       <header className="cs-hero">
         <div className="cs-hero-inner">
@@ -37,12 +35,12 @@ export default function Landing() {
               relationships, your habits, your nervous system. Sessions are online, private, and paced to you.
             </p>
             <div className="cs-hero-ctas">
-              <button className="cs-btn cs-btn-amber" onClick={() => openBooking("regular")}>
-                Book a session — ₹1,500
+              <button className="cs-btn cs-btn-amber" onClick={openBooking}>
+                Book a session
               </button>
-              <button className="cs-btn cs-btn-ghost-light" onClick={() => openBooking("urgent")}>
-                Need urgent support?
-              </button>
+              <a href="#fees" className="cs-btn cs-btn-ghost-light">
+                See pricing
+              </a>
             </div>
             <div className="cs-hero-credentials">
               <span>Integrative Counselling</span>
@@ -133,47 +131,55 @@ export default function Landing() {
       <section className="cs-section" id="fees">
         <div className="cs-container">
           <div className="cs-kicker">Sessions &amp; fees</div>
-          <h2 className="cs-h2">Straightforward pricing, two ways to book</h2>
-          <div className="cs-fee-grid">
-            <div className="cs-fee-card">
-              <div>Regular session</div>
-              <div className="price">₹1,500</div>
-              <div className="cs-fee-sub">Per 50-minute session</div>
-              <ul>
-                <li>
-                  <Check size={15} color="#0146c7" /> Pick any open slot in the next 7 days
-                </li>
-                <li>
-                  <Check size={15} color="#0146c7" /> Confirmed once payment is verified
-                </li>
-                <li>
-                  <Check size={15} color="#0146c7" /> Ideal for ongoing or first-time sessions
-                </li>
-              </ul>
-              <button className="cs-btn cs-btn-ghost cs-btn-full" onClick={() => openBooking("regular")}>
-                Book a regular session
-              </button>
-            </div>
+          <h2 className="cs-h2">One simple rule: the sooner you need it, the more it costs</h2>
+          <p className="cs-body-text" style={{ marginBottom: 28 }}>
+            Every session is 50 minutes with Munira. Price is set automatically by how far out your chosen
+            date is — book further ahead and it costs less.
+          </p>
+          <div className="cs-fee-grid cs-fee-grid-3">
             <div className="cs-fee-card urgent">
-              <div>Urgent session</div>
+              <div>Urgent</div>
               <div className="price">₹4,500</div>
-              <div className="cs-fee-sub">Priority, same-day where possible</div>
+              <div className="cs-fee-sub">Within the next 10 days</div>
               <ul>
-                <li>
-                  <Check size={15} color="#fcc85e" /> Limited slots, reviewed by the team in real time
-                </li>
                 <li>
                   <Check size={15} color="#fcc85e" /> For when things feel like they can't wait
                 </li>
                 <li>
-                  <Check size={15} color="#fcc85e" /> Fastest possible confirmation turnaround
+                  <Check size={15} color="#fcc85e" /> Reviewed by the team in real time
                 </li>
               </ul>
-              <button className="cs-btn cs-btn-amber cs-btn-full" onClick={() => openBooking("urgent")}>
-                Book an urgent session
-              </button>
+            </div>
+            <div className="cs-fee-card">
+              <div>Priority</div>
+              <div className="price">₹2,500</div>
+              <div className="cs-fee-sub">11–25 days out</div>
+              <ul>
+                <li>
+                  <Check size={15} color="#0146c7" /> A good middle ground for planning ahead
+                </li>
+                <li>
+                  <Check size={15} color="#0146c7" /> Still gets priority scheduling attention
+                </li>
+              </ul>
+            </div>
+            <div className="cs-fee-card">
+              <div>Standard</div>
+              <div className="price">₹1,500</div>
+              <div className="cs-fee-sub">26+ days out</div>
+              <ul>
+                <li>
+                  <Check size={15} color="#0146c7" /> The most affordable way to book
+                </li>
+                <li>
+                  <Check size={15} color="#0146c7" /> Ideal for ongoing, planned sessions
+                </li>
+              </ul>
             </div>
           </div>
+          <button className="cs-btn cs-btn-amber" style={{ marginTop: 24 }} onClick={openBooking}>
+            Book a session
+          </button>
         </div>
       </section>
 
@@ -191,7 +197,7 @@ export default function Landing() {
               {
                 n: "2",
                 t: "Pick a slot & pay by QR",
-                d: "Choose regular or urgent, pick an open time, then scan the QR code shown at checkout — no card details, no gateway.",
+                d: "Pick an open date and time — your price is shown right there — then scan the QR code at checkout. No card details, no gateway.",
               },
               {
                 n: "3",
@@ -276,7 +282,7 @@ export default function Landing() {
         </div>
       </footer>
 
-      {showBooking && <BookingModal onClose={() => setShowBooking(false)} initialType={pendingType} />}
+      {showBooking && <BookingModal onClose={() => setShowBooking(false)} />}
     </>
   );
 }

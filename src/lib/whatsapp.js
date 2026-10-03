@@ -1,4 +1,5 @@
 import { fmtDayLong } from "./dates";
+import { tierLabel } from "./pricing";
 
 // WhatsApp's click-to-chat links need digits only — no +, spaces, or dashes.
 // We assume an Indian number when someone enters a bare 10-digit number with
@@ -22,7 +23,7 @@ export function buildWaLink(phone, text) {
 
 export function buildConfirmMessage(b) {
   const name = b?.patient?.full_name || b?.name || "";
-  const typeLabel = b?.type === "urgent" ? "urgent" : "regular";
+  const typeLabel = tierLabel(b?.type).toLowerCase();
   return [
     `Dear Mr./Ms. ${name},`,
     "",

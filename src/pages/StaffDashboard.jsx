@@ -4,6 +4,8 @@ import {
   ArrowLeft,
   Clock,
   CalendarClock,
+  CalendarDays,
+  ChevronLeft,
   Ban,
   Users,
   Phone,
@@ -11,6 +13,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import RescheduleModal from "../components/RescheduleModal";
 import { useAuth } from "../lib/auth";
 import {
   fetchAllSessions,
@@ -24,8 +27,19 @@ import {
   fetchPatients,
   fetchPatientSessions,
 } from "../lib/data";
-import { TIMES, DAY_COUNT, getDays, toISODate, fmtDayLong, STATUS_LABEL } from "../lib/dates";
+import {
+  TIMES,
+  DAY_COUNT,
+  getDays,
+  toISODate,
+  fmtDayLong,
+  STATUS_LABEL,
+  getMonthGrid,
+  addMonths,
+  monthLabel,
+} from "../lib/dates";
 import { buildWaLink, buildConfirmMessage, buildDeclineMessage } from "../lib/whatsapp";
+import { tierLabel } from "../lib/pricing";
 
 export default function StaffDashboard() {
   const { session, profile, signOut } = useAuth();
@@ -70,6 +84,9 @@ export default function StaffDashboard() {
         <button className={`cs-admin-tab ${tab === "requests" ? "active" : ""}`} onClick={() => setTab("requests")}>
           <CalendarClock size={15} /> Requests
         </button>
+        <button className={`cs-admin-tab ${tab === "calendar" ? "active" : ""}`} onClick={() => setTab("calendar")}>
+          <CalendarDays size={15} /> Calendar
+        </button>
         <button className={`cs-admin-tab ${tab === "availability" ? "active" : ""}`} onClick={() => setTab("availability")}>
           <Ban size={15} /> Availability
         </button>
@@ -79,6 +96,7 @@ export default function StaffDashboard() {
       </div>
 
       {tab === "requests" && <RequestsTab />}
+      {tab === "calendar" && <CalendarTab />}
       {tab === "availability" && <AvailabilityTab staffId={session?.user?.id} />}
       {tab === "patients" && <PatientsTab staffId={session?.user?.id} />}
     </div>
@@ -150,6 +168,7 @@ function RequestsTab() {
           onDecline={() => decide(b, "declined")}
           onToggleEditor={() => toggleEditor(b)}
           onDraftChange={(text) => setDrafts((d) => ({ ...d, [b.id]: text }))}
+          onChanged={load}
         />
       ))}
 
@@ -166,15 +185,17 @@ function RequestsTab() {
           open={!!openIds[b.id]}
           onToggleEditor={() => toggleEditor(b)}
           onDraftChange={(text) => setDrafts((d) => ({ ...d, [b.id]: text }))}
+          onChanged={load}
         />
       ))}
     </div>
   );
 }
 
-function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEditor, onDraftChange }) {
+function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEditor, onDraftChange, onChanged }) {
   const phone = b.patient?.phone;
   const plainWaLink = buildWaLink(phone);
+  const [editing, setEditing] = useState(false);
 
   function sendViaWhatsApp() {
     window.open(buildWaLink(phone, draft || ""), "_blank", "noopener,noreferrer");
@@ -185,7 +206,7 @@ function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEdit
       <div className="cs-req-top">
         <div>
           <b>{b.patient?.full_name || "Unknown"}</b>
-          <span className={`cs-type-pill ${b.type}`}>{b.type === "urgent" ? "Urgent" : "Regular"}</span>
+          <span className={`cs-type-pill ${b.type}`}>{tierLabel(b.type)}</span>
         </div>
         {b.status === "pending" ? (
           <span className="cs-req-amt">₹{b.amount.toLocaleString("en-IN")}</span>
@@ -207,6 +228,9 @@ function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEdit
             Message on WhatsApp
           </a>
         )}
+        <button className="cs-btn cs-btn-light" onClick={() => setEditing(true)}>
+          Edit
+        </button>
         {b.status === "pending" && (
           <>
             <button className="cs-btn cs-btn-light" onClick={onDecline}>
@@ -234,11 +258,172 @@ function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEdit
           </button>
         </div>
       )}
+
+      {editing && (
+        <RescheduleModal
+          booking={b}
+          onClose={() => setEditing(false)}
+          onSaved={() => onChanged && onChanged()}
+        />
+      )}
     </div>
   );
 }
 
 /* =====================  AVAILABILITY  ===================== */
+
+/* =====================  CALENDAR  ===================== */
+
+const STATUS_DOT_CLASS = {
+  pending: "cs-dot-pending",
+  confirmed: "cs-dot-confirmed",
+  completed: "cs-dot-completed",
+  declined: "cs-dot-declined",
+};
+
+function CalendarTab() {
+  const [monthDate, setMonthDate] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d;
+  });
+  const [sessions, setSessions] = useState([]);
+  const [blocked, setBlocked] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedIso, setSelectedIso] = useState(null);
+  const [editingBooking, setEditingBooking] = useState(null);
+
+  const grid = useMemo(() => getMonthGrid(monthDate), [monthDate]);
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monthDate]);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const start = toISODate(grid[0].date);
+      const end = toISODate(grid[grid.length - 1].date);
+      const [allSessions, blocks] = await Promise.all([fetchAllSessions(), fetchBlockedSlots(start, end)]);
+      setSessions(allSessions);
+      setBlocked(blocks);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const byDay = useMemo(() => {
+    const map = {};
+    sessions.forEach((s) => {
+      if (!map[s.session_date]) map[s.session_date] = [];
+      map[s.session_date].push(s);
+    });
+    return map;
+  }, [sessions]);
+
+  const blockedByDay = useMemo(() => {
+    const map = {};
+    blocked.forEach((b) => {
+      map[b.block_date] = (map[b.block_date] || 0) + 1;
+    });
+    return map;
+  }, [blocked]);
+
+  const today = toISODate(new Date());
+  const selectedDaySessions = selectedIso ? (byDay[selectedIso] || []).sort((a, b) => a.time_slot.localeCompare(b.time_slot)) : [];
+
+  return (
+    <div>
+      <div className="cs-cal-header">
+        <button className="cs-btn cs-btn-light" onClick={() => setMonthDate((d) => addMonths(d, -1))}>
+          <ChevronLeft size={15} />
+        </button>
+        <b>{monthLabel(monthDate)}</b>
+        <button className="cs-btn cs-btn-light" onClick={() => setMonthDate((d) => addMonths(d, 1))}>
+          <ChevronRight size={15} />
+        </button>
+      </div>
+
+      {loading ? (
+        <p className="cs-admin-empty">Loading calendar…</p>
+      ) : (
+        <>
+          <div className="cs-cal-weekdays">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+              <div key={d}>{d}</div>
+            ))}
+          </div>
+          <div className="cs-cal-grid">
+            {grid.map((cell, i) => {
+              const iso = toISODate(cell.date);
+              const daySessions = (byDay[iso] || []).filter((s) => s.status !== "declined");
+              const isToday = iso === today;
+              const isSelected = iso === selectedIso;
+              const hasBlocked = !!blockedByDay[iso];
+              return (
+                <div
+                  key={i}
+                  className={`cs-cal-cell ${cell.inMonth ? "" : "dim"} ${isToday ? "today" : ""} ${isSelected ? "selected" : ""}`}
+                  onClick={() => setSelectedIso(iso)}
+                >
+                  <span className="cs-cal-daynum">{cell.date.getDate()}</span>
+                  {hasBlocked && <span className="cs-cal-blocked-mark" title="Some slots blocked">●</span>}
+                  <div className="cs-cal-dots">
+                    {daySessions.slice(0, 3).map((s) => (
+                      <span key={s.id} className={`cs-cal-dot ${STATUS_DOT_CLASS[s.status] || ""}`} />
+                    ))}
+                    {daySessions.length > 3 && <span className="cs-cal-more">+{daySessions.length - 3}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="cs-cal-legend">
+            <span><i className="cs-cal-dot cs-dot-pending" /> Pending</span>
+            <span><i className="cs-cal-dot cs-dot-confirmed" /> Confirmed</span>
+            <span><i className="cs-cal-dot cs-dot-completed" /> Completed</span>
+          </div>
+
+          {selectedIso && (
+            <div className="cs-cal-day-panel">
+              <h4 className="cs-admin-section-title">{fmtDayLong(selectedIso)}</h4>
+              {selectedDaySessions.length === 0 && <p className="cs-admin-empty">Nothing scheduled this day.</p>}
+              {selectedDaySessions.map((s) => (
+                <div className="cs-req-card quiet" key={s.id}>
+                  <div className="cs-req-top">
+                    <div>
+                      <b>{s.patient?.full_name || "Unknown"}</b>
+                      <span className={`cs-type-pill ${s.type}`}>{tierLabel(s.type)}</span>
+                    </div>
+                    <span className={`cs-status-pill ${s.status}`}>{STATUS_LABEL[s.status]}</span>
+                  </div>
+                  <div className="cs-req-meta">
+                    {s.time_slot} · ₹{s.amount.toLocaleString("en-IN")} · {s.patient?.phone}
+                  </div>
+                  <div className="cs-req-actions">
+                    <button className="cs-btn cs-btn-light" onClick={() => setEditingBooking(s)}>
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {editingBooking && (
+            <RescheduleModal
+              booking={editingBooking}
+              onClose={() => setEditingBooking(null)}
+              onSaved={load}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
 
 function AvailabilityTab({ staffId }) {
   const days = useMemo(() => getDays(DAY_COUNT), []);
@@ -417,6 +602,7 @@ function SessionNoteEditor({ s, staffId, onSaved }) {
   const [clinicalNotes, setClinicalNotes] = useState("");
   const [clinicalLoaded, setClinicalLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   async function open() {
     setExpanded(!expanded);
@@ -448,7 +634,7 @@ function SessionNoteEditor({ s, staffId, onSaved }) {
       <div className="cs-req-top" style={{ cursor: "pointer" }} onClick={open}>
         <div>
           <b>{fmtDayLong(s.session_date)}</b>
-          <span className={`cs-type-pill ${s.type}`}>{s.type === "urgent" ? "Urgent" : "Regular"}</span>
+          <span className={`cs-type-pill ${s.type}`}>{tierLabel(s.type)}</span>
         </div>
         <span className={`cs-status-pill ${s.status}`}>{STATUS_LABEL[s.status]}</span>
       </div>
@@ -465,6 +651,9 @@ function SessionNoteEditor({ s, staffId, onSaved }) {
             <textarea rows={3} value={clinicalNotes} onChange={(e) => setClinicalNotes(e.target.value)} placeholder="Private process notes" />
           </div>
           <div className="cs-req-actions">
+            <button className="cs-btn cs-btn-light" onClick={() => setEditing(true)}>
+              Edit
+            </button>
             {s.status === "confirmed" && (
               <button className="cs-btn cs-btn-light" onClick={markCompleted}>
                 Mark completed
@@ -475,6 +664,10 @@ function SessionNoteEditor({ s, staffId, onSaved }) {
             </button>
           </div>
         </div>
+      )}
+
+      {editing && (
+        <RescheduleModal booking={s} onClose={() => setEditing(false)} onSaved={onSaved} />
       )}
     </div>
   );

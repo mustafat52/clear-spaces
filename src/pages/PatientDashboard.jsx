@@ -6,6 +6,7 @@ import BookingModal from "../components/BookingModal";
 import { useAuth } from "../lib/auth";
 import { fetchMySessions } from "../lib/data";
 import { fmtDayLong, STATUS_LABEL } from "../lib/dates";
+import { tierLabel } from "../lib/pricing";
 
 export default function PatientDashboard() {
   const { session, profile, signOut } = useAuth();
@@ -111,7 +112,7 @@ function SessionCard({ s }) {
       <div className="cs-req-top">
         <div>
           <b>{fmtDayLong(s.session_date)}</b>
-          <span className={`cs-type-pill ${s.type}`}>{s.type === "urgent" ? "Urgent" : "Regular"}</span>
+          <span className={`cs-type-pill ${s.type}`}>{tierLabel(s.type)}</span>
         </div>
         <span className={`cs-status-pill ${s.status}`}>{STATUS_LABEL[s.status]}</span>
       </div>

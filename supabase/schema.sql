@@ -27,7 +27,7 @@ create table public.profiles (
 create table public.sessions (
   id uuid primary key default gen_random_uuid(),
   patient_id uuid not null references public.profiles(id) on delete cascade,
-  type text not null check (type in ('regular', 'urgent')),
+  type text not null check (type in ('urgent', 'priority', 'standard')),
   session_date date not null,
   time_slot text not null,
   amount integer not null,
@@ -58,6 +58,20 @@ create table public.blocked_slots (
   created_at timestamptz not null default now(),
   unique (block_date, time_slot)
 );
+
+-- ============================================================
+-- BOOKING INTEGRITY
+-- Two patients submitting for the same slot within moments of each
+-- other is a real race condition, not a hypothetical — the booking
+-- modal's availability check only runs once, when the calendar step
+-- loads. This index is what actually stops the second booking from
+-- being created, at the database level, regardless of what the UI
+-- did or didn't check a few seconds earlier.
+-- ============================================================
+
+create unique index sessions_no_double_booking
+  on public.sessions (session_date, time_slot)
+  where status in ('pending', 'confirmed');
 
 -- ============================================================
 -- AUTO-CREATE PROFILE ON SIGNUP
@@ -175,6 +189,23 @@ as $$
 $$;
 
 grant execute on function public.get_taken_slots(date, date) to anon, authenticated;
+
+-- ============================================================
+-- MIGRATION — if you already ran this file before lead-time pricing
+-- ============================================================
+-- Pricing changed from a patient-chosen "regular/urgent" to three bands
+-- based on how far out the date is (urgent / priority / standard). If
+-- your project already has the old 'regular' / 'urgent' constraint, run
+-- just this block (not the whole file) in the SQL editor:
+--
+--   alter table public.sessions drop constraint if exists sessions_type_check;
+--   alter table public.sessions add constraint sessions_type_check
+--     check (type in ('urgent', 'priority', 'standard'));
+--
+--   -- any existing rows still saying 'regular' won't match the new
+--   -- constraint going forward on update, but won't break on read.
+--   -- Relabel old test data if you want it tidy:
+--   update public.sessions set type = 'standard' where type = 'regular';
 
 -- ============================================================
 -- ONE-TIME MANUAL STEP — promote a staff account

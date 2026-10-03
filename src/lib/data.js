@@ -69,6 +69,13 @@ export async function updateSessionStatus(sessionId, status) {
   if (error) throw error;
 }
 
+export async function rescheduleSession(sessionId, { sessionDate, timeSlot, amount }) {
+  const patch = { session_date: sessionDate, time_slot: timeSlot, updated_at: new Date().toISOString() };
+  if (amount !== undefined) patch.amount = amount;
+  const { error } = await supabase.from("sessions").update(patch).eq("id", sessionId);
+  if (error) throw error;
+}
+
 export async function updateSharedNotes(sessionId, sharedNotes) {
   const { error } = await supabase
     .from("sessions")

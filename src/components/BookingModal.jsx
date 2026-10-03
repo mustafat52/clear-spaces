@@ -4,8 +4,9 @@ import Logo from "./Logo";
 import { useAuth } from "../lib/auth";
 import { fetchTakenSlots, createSessionRequest } from "../lib/data";
 import { TIMES, DAY_COUNT, getDays, toISODate, fmtDayLong } from "../lib/dates";
+import { computeTier, compactAmount } from "../lib/pricing";
 
-const STEP_LABELS = ["Session", "Schedule", "Notes", "Payment"];
+const STEP_LABELS = ["Schedule", "Notes", "Payment"];
 
 function QRDemo() {
   const cells = useMemo(() => {
@@ -39,13 +40,12 @@ function QRDemo() {
   );
 }
 
-export default function BookingModal({ onClose, initialType }) {
-  const { session, profile } = useAuth();
+export default function BookingModal({ onClose }) {
+  const { session } = useAuth();
   const days = useMemo(() => getDays(DAY_COUNT), []);
 
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(null);
-  const [sessionType, setSessionType] = useState(initialType || null);
   const [dayIdx, setDayIdx] = useState(null);
   const [timeIdx, setTimeIdx] = useState(null);
   const [notes, setNotes] = useState("");
@@ -54,11 +54,11 @@ export default function BookingModal({ onClose, initialType }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const [taken, setTaken] = useState({}); // "iso-time" -> true
+  const [taken, setTaken] = useState({});
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const visibleDays = sessionType === "urgent" ? days.slice(0, 2) : days;
-  const amount = sessionType === "urgent" ? 4500 : 1500;
+  const selectedIso = dayIdx !== null ? toISODate(days[dayIdx]) : null;
+  const tier = selectedIso ? computeTier(selectedIso) : null;
 
   async function loadTakenSlots() {
     setLoadingSlots(true);
@@ -79,13 +79,12 @@ export default function BookingModal({ onClose, initialType }) {
   }
 
   useEffect(() => {
-    if (step !== 2) return;
     loadTakenSlots();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
+  }, []);
 
   function isTaken(idx, timeLabel) {
-    return !!taken[`${toISODate(visibleDays[idx])}-${timeLabel}`];
+    return !!taken[`${toISODate(days[idx])}-${timeLabel}`];
   }
 
   async function submit() {
@@ -94,21 +93,19 @@ export default function BookingModal({ onClose, initialType }) {
     try {
       const b = await createSessionRequest({
         patientId: session.user.id,
-        type: sessionType,
-        sessionDate: toISODate(visibleDays[dayIdx]),
+        type: tier.key,
+        sessionDate: selectedIso,
         timeSlot: TIMES[timeIdx],
-        amount,
+        amount: tier.amount,
         txnRef,
         clientNotes: notes,
       });
       setDone(b);
     } catch (e) {
       if (e.code === "23505") {
-        // The database's unique index caught a collision — someone else
-        // booked this exact slot in the moments since we last checked.
         setError("Someone just booked this exact slot. Pick another time below.");
         setTimeIdx(null);
-        setStep(2);
+        setStep(1);
         loadTakenSlots();
       } else {
         setError(e.message || "Something went wrong submitting your request.");
@@ -131,7 +128,7 @@ export default function BookingModal({ onClose, initialType }) {
         {!done && (
           <>
             <div className="cs-progress">
-              {[1, 2, 3, 4].map((n) => (
+              {[1, 2, 3].map((n) => (
                 <div key={n} className={`cs-progress-dot ${step >= n ? "active" : ""}`} />
               ))}
             </div>
@@ -148,40 +145,67 @@ export default function BookingModal({ onClose, initialType }) {
 
           {!done && step === 1 && (
             <>
-              <h3 className="cs-modal-title">Choose your session</h3>
-              <p className="cs-modal-sub">Booking as {profile?.full_name || session?.user?.email}.</p>
+              <h3 className="cs-modal-title">Pick a day &amp; time</h3>
+              <p className="cs-modal-sub">
+                {loadingSlots
+                  ? "Checking live availability…"
+                  : "Pricing depends on how soon your session is — shown under each date. Grayed-out times are already taken."}
+              </p>
 
-              <div
-                className={`cs-type-card ${sessionType === "regular" ? "selected" : ""}`}
-                onClick={() => setSessionType("regular")}
-              >
-                <div className="cs-type-card-top">
-                  <b>Regular session</b>
-                  <span className="amt">₹1,500</span>
-                </div>
-                <p>50-minute session. Choose any open slot over the next 7 days.</p>
+              <div className="cs-day-strip">
+                {days.map((d, i) => {
+                  const dTier = computeTier(toISODate(d));
+                  return (
+                    <div
+                      key={i}
+                      className={`cs-day-pill ${dayIdx === i ? "selected" : ""}`}
+                      onClick={() => {
+                        setDayIdx(i);
+                        setTimeIdx(null);
+                        setError("");
+                      }}
+                    >
+                      <span className="dow">{d.toLocaleDateString(undefined, { weekday: "short" })}</span>
+                      <span className="dom">{d.getDate()}</span>
+                      <span className="cs-day-price">{compactAmount(dTier.amount)}</span>
+                    </div>
+                  );
+                })}
               </div>
 
-              <div
-                className={`cs-type-card ${sessionType === "urgent" ? "selected" : ""}`}
-                onClick={() => setSessionType("urgent")}
-              >
-                <div className="cs-type-card-top">
-                  <b>Urgent session</b>
-                  <span className="amt">₹4,500</span>
-                </div>
-                <p>Priority booking with limited same-day / next-day slots, reviewed by the team.</p>
-              </div>
+              {dayIdx !== null && (
+                <>
+                  <div className="cs-time-grid">
+                    {TIMES.map((t, i) => {
+                      const takenSlot = isTaken(dayIdx, t);
+                      return (
+                        <div
+                          key={t}
+                          className={`cs-time-slot ${timeIdx === i ? "selected" : ""} ${takenSlot ? "booked" : ""}`}
+                          onClick={() => {
+                            if (!takenSlot) {
+                              setTimeIdx(i);
+                              setError("");
+                            }
+                          }}
+                        >
+                          <Clock size={12} style={{ verticalAlign: "-1px", marginRight: 5 }} />
+                          {t}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="cs-tier-hint">
+                    <b>{tier.label} pricing</b> — {tier.blurb}: ₹{tier.amount.toLocaleString("en-IN")}
+                  </div>
+                </>
+              )}
 
               <div className="cs-modal-nav" style={{ justifyContent: "flex-end" }}>
                 <button
                   className="cs-btn cs-btn-amber"
-                  disabled={!sessionType}
-                  onClick={() => {
-                    setDayIdx(null);
-                    setTimeIdx(null);
-                    setStep(2);
-                  }}
+                  disabled={dayIdx === null || timeIdx === null}
+                  onClick={() => setStep(2)}
                 >
                   Continue <ChevronRight size={15} style={{ verticalAlign: "-2px" }} />
                 </button>
@@ -191,71 +215,6 @@ export default function BookingModal({ onClose, initialType }) {
 
           {!done && step === 2 && (
             <>
-              <h3 className="cs-modal-title">Pick a day &amp; time</h3>
-              <p className="cs-modal-sub">
-                {loadingSlots
-                  ? "Checking live availability…"
-                  : sessionType === "urgent"
-                  ? "Urgent slots are limited — the team confirms based on real-time availability."
-                  : "Grayed-out times are already booked or unavailable."}
-              </p>
-
-              <div className="cs-day-strip">
-                {visibleDays.map((d, i) => (
-                  <div
-                    key={i}
-                    className={`cs-day-pill ${dayIdx === i ? "selected" : ""}`}
-                    onClick={() => {
-                      setDayIdx(i);
-                      setTimeIdx(null);
-                    }}
-                  >
-                    <span className="dow">{d.toLocaleDateString(undefined, { weekday: "short" })}</span>
-                    <span className="dom">{d.getDate()}</span>
-                  </div>
-                ))}
-              </div>
-
-              {dayIdx !== null && (
-                <div className="cs-time-grid">
-                  {TIMES.map((t, i) => {
-                    const takenSlot = isTaken(dayIdx, t);
-                    return (
-                      <div
-                        key={t}
-                        className={`cs-time-slot ${timeIdx === i ? "selected" : ""} ${takenSlot ? "booked" : ""}`}
-                        onClick={() => {
-                          if (!takenSlot) {
-                            setTimeIdx(i);
-                            setError("");
-                          }
-                        }}
-                      >
-                        <Clock size={12} style={{ verticalAlign: "-1px", marginRight: 5 }} />
-                        {t}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              <div className="cs-modal-nav">
-                <button className="cs-btn cs-btn-ghost" onClick={() => setStep(1)}>
-                  <ChevronLeft size={15} style={{ verticalAlign: "-2px" }} /> Back
-                </button>
-                <button
-                  className="cs-btn cs-btn-amber"
-                  disabled={dayIdx === null || timeIdx === null}
-                  onClick={() => setStep(3)}
-                >
-                  Continue <ChevronRight size={15} style={{ verticalAlign: "-2px" }} />
-                </button>
-              </div>
-            </>
-          )}
-
-          {!done && step === 3 && (
-            <>
               <h3 className="cs-modal-title">Anything you'd like to share?</h3>
               <p className="cs-modal-sub">Optional — a line or two is enough. This goes to Munira's team ahead of your session.</p>
               <div className="cs-field">
@@ -263,23 +222,24 @@ export default function BookingModal({ onClose, initialType }) {
                 <textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What's on your mind lately?" />
               </div>
               <div className="cs-modal-nav">
-                <button className="cs-btn cs-btn-ghost" onClick={() => setStep(2)}>
+                <button className="cs-btn cs-btn-ghost" onClick={() => setStep(1)}>
                   <ChevronLeft size={15} style={{ verticalAlign: "-2px" }} /> Back
                 </button>
-                <button className="cs-btn cs-btn-amber" onClick={() => setStep(4)}>
+                <button className="cs-btn cs-btn-amber" onClick={() => setStep(3)}>
                   Continue to payment <ChevronRight size={15} style={{ verticalAlign: "-2px" }} />
                 </button>
               </div>
             </>
           )}
 
-          {!done && step === 4 && (
+          {!done && step === 3 && (
             <>
               <h3 className="cs-modal-title">Complete payment</h3>
               <p className="cs-modal-sub">Scan the QR code below and pay the amount shown.</p>
               <div className="cs-pay-box">
                 <div className="cs-pay-amt">
-                  Amount due<b>₹{amount.toLocaleString("en-IN")}</b>
+                  Amount due<b>₹{tier.amount.toLocaleString("en-IN")}</b>
+                  <span className="cs-pay-tier">{tier.label} — {fmtDayLong(selectedIso)}, {TIMES[timeIdx]}</span>
                 </div>
                 <div className="cs-qr-frame">
                   <QRDemo />
@@ -300,11 +260,11 @@ export default function BookingModal({ onClose, initialType }) {
                 <ShieldCheck size={16} style={{ flexShrink: 0, marginTop: 1 }} />
                 <span>
                   Your slot is held once you submit. Munira's team verifies the payment manually and confirms your
-                  session — usually within a few hours (faster for urgent requests).
+                  session — usually within a few hours (faster for sessions booked close to the date).
                 </span>
               </div>
               <div className="cs-modal-nav">
-                <button className="cs-btn cs-btn-ghost" onClick={() => setStep(3)}>
+                <button className="cs-btn cs-btn-ghost" onClick={() => setStep(2)}>
                   <ChevronLeft size={15} style={{ verticalAlign: "-2px" }} /> Back
                 </button>
                 <button className="cs-btn cs-btn-amber" disabled={!paid || submitting} onClick={submit}>
@@ -326,8 +286,8 @@ export default function BookingModal({ onClose, initialType }) {
               </p>
               <div className="cs-summary-card">
                 <div className="cs-summary-row">
-                  <span>Session type</span>
-                  <span>{done.type === "urgent" ? "Urgent" : "Regular"}</span>
+                  <span>Pricing tier</span>
+                  <span>{computeTier(done.session_date).label}</span>
                 </div>
                 <div className="cs-summary-row">
                   <span>Date</span>

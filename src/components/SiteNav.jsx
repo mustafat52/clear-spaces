@@ -4,7 +4,7 @@ import { Menu, X, Instagram } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../lib/auth";
 
-const INSTAGRAM_URL = "https://www.instagram.com/counsellor_munira/";
+const INSTAGRAM_URL = "https://www.instagram.com/counsellor__munira/";
 
 export default function SiteNav({ onBook }) {
   const { session, isStaff, signOut } = useAuth();

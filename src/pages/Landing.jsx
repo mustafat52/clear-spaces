@@ -267,7 +267,7 @@ export default function Landing() {
               </p>
             </div>
             <div style={{ display: "flex", gap: 18 }}>
-              <a href="https://www.instagram.com/counsellor_munira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <a href="https://www.instagram.com/counsellor__munira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram size={19} />
               </a>
               <a href="#" aria-label="YouTube">

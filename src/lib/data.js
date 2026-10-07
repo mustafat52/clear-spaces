@@ -19,7 +19,6 @@ export async function createSessionRequest({
   sessionDate,
   timeSlot,
   amount,
-  txnRef,
   clientNotes,
 }) {
   const { data, error } = await supabase
@@ -30,9 +29,40 @@ export async function createSessionRequest({
       session_date: sessionDate,
       time_slot: timeSlot,
       amount,
-      txn_ref: txnRef || null,
       client_notes: clientNotes || null,
       status: "pending",
+      source: "website",
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function createManualSession({
+  manualName,
+  manualPhone,
+  source,
+  type,
+  sessionDate,
+  timeSlot,
+  amount,
+  clientNotes,
+  status,
+}) {
+  const { data, error } = await supabase
+    .from("sessions")
+    .insert({
+      patient_id: null,
+      manual_name: manualName,
+      manual_phone: manualPhone,
+      source: source || "other",
+      type,
+      session_date: sessionDate,
+      time_slot: timeSlot,
+      amount,
+      client_notes: clientNotes || null,
+      status: status || "confirmed",
     })
     .select()
     .single();

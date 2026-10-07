@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Instagram } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../lib/auth";
+
+const INSTAGRAM_URL = "https://www.instagram.com/counsellor_munira/";
 
 export default function SiteNav({ onBook }) {
   const { session, isStaff, signOut } = useAuth();
@@ -34,6 +36,15 @@ export default function SiteNav({ onBook }) {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <a
+          href={INSTAGRAM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="ClearSpaces on Instagram"
+          className="cs-nav-insta"
+        >
+          <Instagram size={19} />
+        </a>
         {session ? (
           <button className="cs-btn cs-btn-ghost" onClick={handleLogout}>
             Log out
@@ -68,6 +79,10 @@ export default function SiteNav({ onBook }) {
           ) : (
             <Link to="/login" onClick={() => setOpen(false)}>Log in</Link>
           )}
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+            <Instagram size={16} style={{ verticalAlign: "-3px", marginRight: 8 }} />
+            Instagram
+          </a>
         </div>
       )}
     </nav>

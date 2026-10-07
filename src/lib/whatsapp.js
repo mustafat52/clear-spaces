@@ -22,14 +22,16 @@ export function buildWaLink(phone, text) {
 }
 
 export function buildConfirmMessage(b) {
-  const name = b?.patient?.full_name || b?.name || "";
+  const name = b?.patient?.full_name || b?.manual_name || "";
   const typeLabel = tierLabel(b?.type).toLowerCase();
   return [
     `Dear Mr./Ms. ${name},`,
     "",
-    `Thank you for booking your appointment with ClearSpaces. We've received your payment and your ${typeLabel} session with Munira is confirmed for ${fmtDayLong(
+    `Thank you for booking your appointment with ClearSpaces. Your ${typeLabel} session with Munira is scheduled for ${fmtDayLong(
       b.session_date
     )} at ${b.time_slot}.`,
+    "",
+    `To confirm this slot, please complete the payment of ₹${b.amount.toLocaleString("en-IN")} here — we'll send the payment details right after this message.`,
     "",
     "Looking forward to your session!",
     "",
@@ -38,7 +40,7 @@ export function buildConfirmMessage(b) {
 }
 
 export function buildDeclineMessage(b) {
-  const name = b?.patient?.full_name || b?.name || "";
+  const name = b?.patient?.full_name || b?.manual_name || "";
   return [
     `Dear Mr./Ms. ${name},`,
     "",

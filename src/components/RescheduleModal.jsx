@@ -92,7 +92,8 @@ export default function RescheduleModal({ booking, onClose, onSaved }) {
         </div>
         <div className="cs-modal-body">
           <p className="cs-modal-sub">
-            {booking.patient?.full_name || "This patient"}'s current slot: {fmtDayLong(booking.session_date)} at{" "}
+            {booking.patient?.full_name || booking.manual_name || "This patient"}'s current slot:{" "}
+            {fmtDayLong(booking.session_date)} at{" "}
             {booking.time_slot}.
           </p>
 

@@ -45,9 +45,9 @@ export default function Landing() {
             <div className="cs-hero-credentials">
               <span>Integrative Counselling</span>
               <span>Trauma &amp; Addiction</span>
-              <span>REBT</span>
-              <span>Applied TA</span>
-              <span>Polyvagal Therapy</span>
+              <span>Marriage &amp; Couple</span>
+              <span>Children &amp; Teenage</span>
+              <span>Family &amp; Relationship</span>
             </div>
           </div>
           <div className="cs-hero-logo">
@@ -65,11 +65,11 @@ export default function Landing() {
             <div className="cs-kicker">About Munira</div>
             <h2 className="cs-h2">Counselling that treats the pattern, not just the moment.</h2>
             <p className="cs-body-text">
-              I work with clients navigating trauma, addiction, and the quieter patterns that shape how we
-              relate to ourselves and others — anxiety loops, people-pleasing, shutdown, self-sabotage. My
-              approach blends REBT, Applied Transactional Analysis, and Polyvagal-informed practice, so
-              sessions move between talking, reflection, and body-based regulation depending on what a session
-              calls for.
+              I work with individuals, couples, and families navigating trauma, addiction, and the quieter
+              patterns that shape how we relate to ourselves and each other — anxiety loops, people-pleasing,
+              shutdown, self-sabotage. Whether it's a marriage finding its footing again, a teenager working
+              through something hard to put into words, or a family untangling old patterns, sessions are
+              paced to what that moment actually calls for.
             </p>
             <p className="cs-body-text" style={{ marginTop: 14 }}>
               Every session is held online, one-on-one, with full confidentiality. Whether you're here for the
@@ -86,7 +86,7 @@ export default function Landing() {
               </div>
               <div className="cs-stat">
                 <b>4</b>
-                <span>Modalities practiced</span>
+                <span>Areas of focus</span>
               </div>
             </div>
           </div>
@@ -103,16 +103,16 @@ export default function Landing() {
               d: "Working through past experiences and dependency patterns at a pace your nervous system can actually handle.",
             },
             {
-              t: "REBT",
-              d: "Rational Emotive Behaviour Therapy — identifying and reshaping the beliefs that drive distress.",
+              t: "Marriage & couple counselling",
+              d: "A space for partners to be heard without it turning into a courtroom — working through conflict, trust, and distance together.",
             },
             {
-              t: "Applied Transactional Analysis",
-              d: "Understanding recurring roles and dynamics in your relationships, and where they were learned.",
+              t: "Children & teenage counselling",
+              d: "Age-appropriate support for younger clients navigating big feelings, school pressure, identity, or change at home.",
             },
             {
-              t: "Polyvagal-informed practice",
-              d: "Nervous-system-aware techniques to help you move out of anxiety, shutdown, or overwhelm.",
+              t: "Family & relationship counselling",
+              d: "Untangling long-standing roles and dynamics within a family, so old patterns stop repeating themselves.",
             },
           ].map((s) => (
             <div className="cs-specialty-row" key={s.t}>
@@ -222,21 +222,29 @@ export default function Landing() {
           <div className="cs-quote-grid">
             {[
               {
-                q: "I came in expecting advice and instead learned to actually notice my own patterns. That shift changed everything.",
-                a: "R., 27",
+                q: "Therapy helped me feel understood and supported. I now handle stress much better.",
+                a: "Zainab",
               },
               {
-                q: "The urgent session option genuinely helped on a night I didn't think I could get through alone.",
-                a: "S., 31",
+                q: "Counseling gave me the tools to manage my anxiety. I'm much happier now.",
+                a: "Shabbir",
               },
               {
-                q: "It's rare to find someone who blends the psychology with the body-based side of healing this well.",
-                a: "A., 24",
+                q: "Talking to my psychologist changed my life. I finally feel at peace.",
+                a: "Nafisa",
+              },
+              {
+                q: "I learned how to cope with my emotions through therapy. It's made a big difference.",
+                a: "Aarti",
+              },
+              {
+                q: "Therapy gave me hope and helped me find my way again.",
+                a: "Sarah B.",
               },
             ].map((t) => (
               <div className="cs-quote" key={t.a}>
                 <p>{t.q}</p>
-                <span>{t.a} · placeholder testimonial</span>
+                <span>{t.a}</span>
               </div>
             ))}
           </div>
@@ -259,7 +267,7 @@ export default function Landing() {
               </p>
             </div>
             <div style={{ display: "flex", gap: 18 }}>
-              <a href="#" aria-label="Instagram">
+              <a href="https://www.instagram.com/counsellor_munira/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram size={19} />
               </a>
               <a href="#" aria-label="YouTube">
@@ -277,7 +285,8 @@ export default function Landing() {
             </a>
           </div>
           <div className="cs-demo-tag">
-            Demo build — testimonials and the QR code are placeholders. Booking data is real (Supabase).
+            Demo build — booking data is real (Supabase); payment is arranged directly over WhatsApp after
+            confirmation.
           </div>
         </div>
       </footer>

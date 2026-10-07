@@ -24,9 +24,18 @@ create table public.profiles (
 
 -- Patient-visible session data. shared_notes is written by staff after a
 -- session and is readable by the patient it belongs to.
+--
+-- patient_id is nullable to support appointments staff creates manually
+-- for someone who contacted via Instagram/WhatsApp and never signed up
+-- on the site — those rows carry manual_name/manual_phone instead, and
+-- are only ever visible to staff (there's no patient login to show them
+-- to). Every row must have one or the other, enforced below.
 create table public.sessions (
   id uuid primary key default gen_random_uuid(),
-  patient_id uuid not null references public.profiles(id) on delete cascade,
+  patient_id uuid references public.profiles(id) on delete cascade,
+  manual_name text,
+  manual_phone text,
+  source text not null default 'website' check (source in ('website', 'instagram', 'whatsapp', 'phone', 'other')),
   type text not null check (type in ('urgent', 'priority', 'standard')),
   session_date date not null,
   time_slot text not null,
@@ -36,7 +45,10 @@ create table public.sessions (
   client_notes text,
   shared_notes text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint sessions_has_a_contact check (
+    patient_id is not null or (manual_name is not null and manual_phone is not null)
+  )
 );
 
 -- Clinical / process notes. Deliberately a SEPARATE table with its own
@@ -141,6 +153,13 @@ create policy "patient creates own session request"
   on public.sessions for insert
   with check (patient_id = auth.uid());
 
+-- Separate from the policy above (multiple permissive insert policies are
+-- OR'd together) so staff can create manual appointments with no
+-- patient_id, for bookings that came in over Instagram/WhatsApp.
+create policy "staff creates manual session"
+  on public.sessions for insert
+  with check (public.is_staff());
+
 create policy "staff update any session"
   on public.sessions for update
   using (public.is_staff());
@@ -206,6 +225,25 @@ grant execute on function public.get_taken_slots(date, date) to anon, authentica
 --   -- constraint going forward on update, but won't break on read.
 --   -- Relabel old test data if you want it tidy:
 --   update public.sessions set type = 'standard' where type = 'regular';
+
+-- ============================================================
+-- MIGRATION — if you already ran this file before manual appointments
+-- ============================================================
+-- Adds support for staff creating appointments directly (for bookings
+-- that came in over Instagram or WhatsApp, with no patient account).
+-- Run this block if your project predates it:
+--
+--   alter table public.sessions alter column patient_id drop not null;
+--   alter table public.sessions add column if not exists manual_name text;
+--   alter table public.sessions add column if not exists manual_phone text;
+--   alter table public.sessions add column if not exists source text not null default 'website'
+--     check (source in ('website', 'instagram', 'whatsapp', 'phone', 'other'));
+--   alter table public.sessions add constraint sessions_has_a_contact check (
+--     patient_id is not null or (manual_name is not null and manual_phone is not null)
+--   );
+--   create policy "staff creates manual session"
+--     on public.sessions for insert
+--     with check (public.is_staff());
 
 -- ============================================================
 -- ONE-TIME MANUAL STEP — promote a staff account

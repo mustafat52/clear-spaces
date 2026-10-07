@@ -1,44 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Clock, X, ChevronRight, ChevronLeft, ShieldCheck, QrCode } from "lucide-react";
+import { Clock, X, ChevronRight, ChevronLeft, ShieldCheck } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../lib/auth";
 import { fetchTakenSlots, createSessionRequest } from "../lib/data";
 import { TIMES, DAY_COUNT, getDays, toISODate, fmtDayLong } from "../lib/dates";
 import { computeTier, compactAmount } from "../lib/pricing";
 
-const STEP_LABELS = ["Schedule", "Notes", "Payment"];
-
-function QRDemo() {
-  const cells = useMemo(() => {
-    const grid = [];
-    for (let r = 0; r < 15; r++) {
-      for (let c = 0; c < 15; c++) {
-        const inFinder = (r < 4 && c < 4) || (r < 4 && c > 10) || (r > 10 && c < 4);
-        if (inFinder) continue;
-        if ((r * 13 + c * 7 + r * c) % 3 === 0) grid.push([r, c]);
-      }
-    }
-    return grid;
-  }, []);
-  const Finder = ({ x, y }) => (
-    <g transform={`translate(${x},${y})`}>
-      <rect width="4" height="4" fill="#0c2b59" />
-      <rect x="0.6" y="0.6" width="2.8" height="2.8" fill="#fff" />
-      <rect x="1.3" y="1.3" width="1.4" height="1.4" fill="#0c2b59" />
-    </g>
-  );
-  return (
-    <svg viewBox="0 0 15 15" width="168" height="168" style={{ display: "block" }}>
-      <rect width="15" height="15" fill="#fff" />
-      <Finder x={0} y={0} />
-      <Finder x={11} y={0} />
-      <Finder x={0} y={11} />
-      {cells.map(([r, c], i) => (
-        <rect key={i} x={c} y={r} width="1" height="1" fill="#0c2b59" />
-      ))}
-    </svg>
-  );
-}
+const STEP_LABELS = ["Schedule", "Details"];
 
 export default function BookingModal({ onClose }) {
   const { session } = useAuth();
@@ -49,8 +17,6 @@ export default function BookingModal({ onClose }) {
   const [dayIdx, setDayIdx] = useState(null);
   const [timeIdx, setTimeIdx] = useState(null);
   const [notes, setNotes] = useState("");
-  const [txnRef, setTxnRef] = useState("");
-  const [paid, setPaid] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -97,7 +63,6 @@ export default function BookingModal({ onClose }) {
         sessionDate: selectedIso,
         timeSlot: TIMES[timeIdx],
         amount: tier.amount,
-        txnRef,
         clientNotes: notes,
       });
       setDone(b);
@@ -128,7 +93,7 @@ export default function BookingModal({ onClose }) {
         {!done && (
           <>
             <div className="cs-progress">
-              {[1, 2, 3].map((n) => (
+              {[1, 2].map((n) => (
                 <div key={n} className={`cs-progress-dot ${step >= n ? "active" : ""}`} />
               ))}
             </div>
@@ -221,53 +186,39 @@ export default function BookingModal({ onClose }) {
                 <label>Notes for this session (optional)</label>
                 <textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What's on your mind lately?" />
               </div>
+
+              <div className="cs-summary-card" style={{ marginBottom: 18 }}>
+                <div className="cs-summary-row">
+                  <span>Pricing tier</span>
+                  <span>{tier?.label}</span>
+                </div>
+                <div className="cs-summary-row">
+                  <span>Date</span>
+                  <span>{selectedIso ? fmtDayLong(selectedIso) : ""}</span>
+                </div>
+                <div className="cs-summary-row">
+                  <span>Time</span>
+                  <span>{timeIdx !== null ? TIMES[timeIdx] : ""}</span>
+                </div>
+                <div className="cs-summary-row">
+                  <span>Amount</span>
+                  <span>₹{tier?.amount.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
+
+              <div className="cs-note-box">
+                <ShieldCheck size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+                <span>
+                  Submitting holds your slot. Munira's team will review your request and reach out on WhatsApp to
+                  confirm — payment is collected directly in that conversation, not on this site.
+                </span>
+              </div>
+
               <div className="cs-modal-nav">
                 <button className="cs-btn cs-btn-ghost" onClick={() => setStep(1)}>
                   <ChevronLeft size={15} style={{ verticalAlign: "-2px" }} /> Back
                 </button>
-                <button className="cs-btn cs-btn-amber" onClick={() => setStep(3)}>
-                  Continue to payment <ChevronRight size={15} style={{ verticalAlign: "-2px" }} />
-                </button>
-              </div>
-            </>
-          )}
-
-          {!done && step === 3 && (
-            <>
-              <h3 className="cs-modal-title">Complete payment</h3>
-              <p className="cs-modal-sub">Scan the QR code below and pay the amount shown.</p>
-              <div className="cs-pay-box">
-                <div className="cs-pay-amt">
-                  Amount due<b>₹{tier.amount.toLocaleString("en-IN")}</b>
-                  <span className="cs-pay-tier">{tier.label} — {fmtDayLong(selectedIso)}, {TIMES[timeIdx]}</span>
-                </div>
-                <div className="cs-qr-frame">
-                  <QRDemo />
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  <QrCode size={13} /> Demo QR — replace with Munira's real UPI QR
-                </div>
-              </div>
-              <div className="cs-field">
-                <label>UPI transaction / reference ID (optional)</label>
-                <input value={txnRef} onChange={(e) => setTxnRef(e.target.value)} placeholder="e.g. 402883XXXXXX" />
-              </div>
-              <label className="cs-check-row">
-                <input type="checkbox" checked={paid} onChange={(e) => setPaid(e.target.checked)} />
-                <span>I've completed this payment via the QR code above.</span>
-              </label>
-              <div className="cs-note-box">
-                <ShieldCheck size={16} style={{ flexShrink: 0, marginTop: 1 }} />
-                <span>
-                  Your slot is held once you submit. Munira's team verifies the payment manually and confirms your
-                  session — usually within a few hours (faster for sessions booked close to the date).
-                </span>
-              </div>
-              <div className="cs-modal-nav">
-                <button className="cs-btn cs-btn-ghost" onClick={() => setStep(2)}>
-                  <ChevronLeft size={15} style={{ verticalAlign: "-2px" }} /> Back
-                </button>
-                <button className="cs-btn cs-btn-amber" disabled={!paid || submitting} onClick={submit}>
+                <button className="cs-btn cs-btn-amber" disabled={submitting} onClick={submit}>
                   {submitting ? "Submitting…" : "Submit request"}
                 </button>
               </div>
@@ -277,12 +228,12 @@ export default function BookingModal({ onClose }) {
           {done && (
             <>
               <div className="cs-confirm-badge">
-                <Clock size={14} /> Pending verification
+                <Clock size={14} /> Pending review
               </div>
               <h3 className="cs-modal-title">Request sent.</h3>
               <p className="cs-modal-sub">
-                Munira's team will verify your payment and confirm this slot. You'll see the status update in
-                "My sessions".
+                Munira's team will review your request and message you on WhatsApp to confirm your slot and collect
+                payment. You'll see the status update in "My sessions" too.
               </p>
               <div className="cs-summary-card">
                 <div className="cs-summary-row">

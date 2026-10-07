@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Logo from "../components/Logo";
 import RescheduleModal from "../components/RescheduleModal";
+import ManualBookingModal from "../components/ManualBookingModal";
 import { useAuth } from "../lib/auth";
 import {
   fetchAllSessions,
@@ -41,10 +42,25 @@ import {
 import { buildWaLink, buildConfirmMessage, buildDeclineMessage } from "../lib/whatsapp";
 import { tierLabel } from "../lib/pricing";
 
+// A session either has a real patient (website booking) or manual_name /
+// manual_phone (staff-created, from an Instagram/WhatsApp conversation).
+// These two helpers pick whichever applies so the rest of the UI doesn't
+// need to know which case it's looking at.
+function patientName(b) {
+  return b.patient?.full_name || b.manual_name || "Unknown";
+}
+function patientPhone(b) {
+  return b.patient?.phone || b.manual_phone || "";
+}
+
 export default function StaffDashboard() {
   const { session, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState("requests");
+  const [showManual, setShowManual] = useState(false);
+  // bumping this remounts whichever tab is active, so a manually-created
+  // appointment shows up immediately instead of waiting for a tab switch
+  const [refreshKey, setRefreshKey] = useState(0);
 
   async function handleLogout() {
     await signOut();
@@ -66,9 +82,14 @@ export default function StaffDashboard() {
             </div>
           </div>
         </div>
-        <button className="cs-btn cs-btn-ghost" onClick={handleLogout}>
-          Log out
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="cs-btn cs-btn-blue" onClick={() => setShowManual(true)}>
+            + New appointment
+          </button>
+          <button className="cs-btn cs-btn-ghost" onClick={handleLogout}>
+            Log out
+          </button>
+        </div>
       </div>
 
       <div className="cs-urgent-note">
@@ -95,10 +116,17 @@ export default function StaffDashboard() {
         </button>
       </div>
 
-      {tab === "requests" && <RequestsTab />}
-      {tab === "calendar" && <CalendarTab />}
-      {tab === "availability" && <AvailabilityTab staffId={session?.user?.id} />}
-      {tab === "patients" && <PatientsTab staffId={session?.user?.id} />}
+      {tab === "requests" && <RequestsTab key={`req-${refreshKey}`} />}
+      {tab === "calendar" && <CalendarTab key={`cal-${refreshKey}`} />}
+      {tab === "availability" && <AvailabilityTab key={`avail-${refreshKey}`} staffId={session?.user?.id} />}
+      {tab === "patients" && <PatientsTab key={`pat-${refreshKey}`} staffId={session?.user?.id} />}
+
+      {showManual && (
+        <ManualBookingModal
+          onClose={() => setShowManual(false)}
+          onSaved={() => setRefreshKey((k) => k + 1)}
+        />
+      )}
     </div>
   );
 }
@@ -193,7 +221,7 @@ function RequestsTab() {
 }
 
 function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEditor, onDraftChange, onChanged }) {
-  const phone = b.patient?.phone;
+  const phone = patientPhone(b);
   const plainWaLink = buildWaLink(phone);
   const [editing, setEditing] = useState(false);
 
@@ -205,8 +233,9 @@ function RequestCard({ b, quiet, draft, open, onConfirm, onDecline, onToggleEdit
     <div className={`cs-req-card ${quiet ? "quiet" : ""}`}>
       <div className="cs-req-top">
         <div>
-          <b>{b.patient?.full_name || "Unknown"}</b>
+          <b>{patientName(b)}</b>
           <span className={`cs-type-pill ${b.type}`}>{tierLabel(b.type)}</span>
+          {b.source && b.source !== "website" && <span className="cs-source-pill">via {b.source}</span>}
         </div>
         {b.status === "pending" ? (
           <span className="cs-req-amt">₹{b.amount.toLocaleString("en-IN")}</span>
@@ -394,13 +423,14 @@ function CalendarTab() {
                 <div className="cs-req-card quiet" key={s.id}>
                   <div className="cs-req-top">
                     <div>
-                      <b>{s.patient?.full_name || "Unknown"}</b>
+                      <b>{patientName(s)}</b>
                       <span className={`cs-type-pill ${s.type}`}>{tierLabel(s.type)}</span>
+                      {s.source && s.source !== "website" && <span className="cs-source-pill">via {s.source}</span>}
                     </div>
                     <span className={`cs-status-pill ${s.status}`}>{STATUS_LABEL[s.status]}</span>
                   </div>
                   <div className="cs-req-meta">
-                    {s.time_slot} · ₹{s.amount.toLocaleString("en-IN")} · {s.patient?.phone}
+                    {s.time_slot} · ₹{s.amount.toLocaleString("en-IN")} · {patientPhone(s)}
                   </div>
                   <div className="cs-req-actions">
                     <button className="cs-btn cs-btn-light" onClick={() => setEditingBooking(s)}>
@@ -501,11 +531,11 @@ function AvailabilityTab({ staffId }) {
                 key={t}
                 className={cls}
                 onClick={() => !existing && toggle(activeIso, t)}
-                title={existing ? `Booked — ${existing.patient?.full_name || "patient"}` : blockedNow ? "Tap to open" : "Tap to block"}
+                title={existing ? `Booked — ${patientName(existing)}` : blockedNow ? "Tap to open" : "Tap to block"}
               >
                 <Clock size={12} style={{ verticalAlign: "-1px", marginRight: 5 }} />
                 {t}
-                {existing && <div className="cs-slot-sub">{existing.patient?.full_name}</div>}
+                {existing && <div className="cs-slot-sub">{patientName(existing)}</div>}
                 {!existing && blockedNow && <div className="cs-slot-sub">Blocked</div>}
               </div>
             );

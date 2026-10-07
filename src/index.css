@@ -94,6 +94,20 @@ img {
 .cs-nav-links a:hover {
   color: var(--blue);
 }
+.cs-nav-insta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cs-nav-insta:hover {
+  background: var(--sky-mist);
+  color: var(--blue);
+}
 
 /* ---------------- BUTTONS ---------------- */
 .cs-btn {
@@ -915,7 +929,8 @@ a.cs-btn {
 }
 .cs-admin-tabs {
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 4px 10px;
   margin-bottom: 22px;
   border-bottom: 1px solid var(--line);
 }
@@ -964,9 +979,10 @@ a.cs-btn {
 }
 .cs-req-top {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 8px 10px;
 }
 .cs-req-top b {
   font-family: "Fraunces", serif;
@@ -1041,6 +1057,15 @@ a.cs-btn {
 .cs-type-pill.priority {
   background: rgba(1, 70, 199, 0.14);
   color: var(--blue);
+}
+.cs-source-pill {
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: var(--cream-warm);
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  text-transform: capitalize;
 }
 .cs-status-pill {
   font-size: 11.5px;
@@ -1297,7 +1322,8 @@ a.cs-btn {
 }
 .cs-cal-legend {
   display: flex;
-  gap: 18px;
+  flex-wrap: wrap;
+  gap: 8px 18px;
   margin-top: 14px;
   font-size: 12px;
   color: var(--text-muted);

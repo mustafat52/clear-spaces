@@ -4,6 +4,9 @@ import { Menu, X, Instagram } from "lucide-react";
 import Logo from "./Logo";
 import { useAuth } from "../lib/auth";
 
+// TEMPORARY: set to true to bring back Log in / Book a session buttons
+const SHOW_BOOKING = false;
+
 const INSTAGRAM_URL = "https://www.instagram.com/counsellor__munira/";
 
 export default function SiteNav({ onBook }) {
@@ -29,6 +32,7 @@ export default function SiteNav({ onBook }) {
       <div className="cs-nav-links">
         <a href="/#about">About</a>
         <a href="/#specialties">Specialties</a>
+        <a href="/#experience">Experience</a>
         <a href="/#fees">Sessions &amp; fees</a>
         <a href="/#how">How it works</a>
         {session && !isStaff && <Link to="/dashboard">My sessions</Link>}
@@ -45,18 +49,22 @@ export default function SiteNav({ onBook }) {
         >
           <Instagram size={19} />
         </a>
-        {session ? (
-          <button className="cs-btn cs-btn-ghost" onClick={handleLogout}>
-            Log out
+        {SHOW_BOOKING && (
+          <>
+          {session ? (
+            <button className="cs-btn cs-btn-ghost" onClick={handleLogout}>
+              Log out
+            </button>
+          ) : (
+            <Link to="/login" className="cs-btn cs-btn-ghost" style={{ textDecoration: "none" }}>
+              Log in
+            </Link>
+          )}
+          <button className="cs-btn cs-btn-amber" onClick={onBook}>
+            Book a session
           </button>
-        ) : (
-          <Link to="/login" className="cs-btn cs-btn-ghost" style={{ textDecoration: "none" }}>
-            Log in
-          </Link>
+          </>
         )}
-        <button className="cs-btn cs-btn-amber" onClick={onBook}>
-          Book a session
-        </button>
         <button className="cs-hamburger" aria-label="Menu" onClick={() => setOpen(!open)}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -66,6 +74,7 @@ export default function SiteNav({ onBook }) {
         <div className="cs-mobile-menu">
           <a href="/#about" onClick={() => setOpen(false)}>About</a>
           <a href="/#specialties" onClick={() => setOpen(false)}>Specialties</a>
+          <a href="/#experience" onClick={() => setOpen(false)}>Experience</a>
           <a href="/#fees" onClick={() => setOpen(false)}>Sessions &amp; fees</a>
           <a href="/#how" onClick={() => setOpen(false)}>How it works</a>
           {session && !isStaff && (
@@ -74,11 +83,11 @@ export default function SiteNav({ onBook }) {
           {isStaff && (
             <Link to="/staff" onClick={() => setOpen(false)}>Staff dashboard</Link>
           )}
-          {session ? (
+          {SHOW_BOOKING && (session ? (
             <button onClick={() => { setOpen(false); handleLogout(); }}>Log out</button>
           ) : (
             <Link to="/login" onClick={() => setOpen(false)}>Log in</Link>
-          )}
+          ))}
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
             <Instagram size={16} style={{ verticalAlign: "-3px", marginRight: 8 }} />
             Instagram

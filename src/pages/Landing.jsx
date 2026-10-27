@@ -1,15 +1,87 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, Sparkles, MessageCircle, Youtube, Instagram, LayoutDashboard } from "lucide-react";
+import { Check, Sparkles, Award, ChevronLeft, ChevronRight, Ghost, Zap, CloudLightning, HelpCircle, HeartCrack, Link2, Users, Briefcase, GraduationCap, ZoomIn, X, Eye, HeartHandshake, Layers, Compass, MessageCircle, Youtube, Instagram, LayoutDashboard } from "lucide-react";
 import Logo from "../components/Logo";
 import SiteNav from "../components/SiteNav";
 import BookingModal from "../components/BookingModal";
 import { useAuth } from "../lib/auth";
 
+const COMMON_ISSUES = [
+  { t: "Fears", Icon: Ghost },
+  { t: "Panic", Icon: Zap },
+  { t: "Anxiety", Icon: CloudLightning },
+  { t: "Confusion", Icon: HelpCircle },
+  { t: "Betrayals", Icon: HeartCrack },
+  { t: "Addictions", Icon: Link2 },
+  { t: "Dysfunctional Relationships", Icon: Users },
+];
+
+const CERTS = [
+  {
+    img: "/certs/diploma-integrative-counselling.jpg",
+    title: "Diploma in Integrative Counselling",
+    date: "March 2021",
+    desc: "150 hours of training in an integrative approach to counselling skills, theory and practice — Carkhuff's Model, Rational Emotive Behaviour Therapy and Transactional Analysis.",
+    featured: true,
+  },
+  {
+    img: "/certs/rebt-counselling.jpg",
+    title: "Certificate in Counselling",
+    date: "Jan – Mar 2021",
+    desc: "Advanced training in Rational Emotive Behaviour Therapy.",
+  },
+  {
+    img: "/certs/applied-transactional-analysis.jpg",
+    title: "Certificate in Applied Transactional Analysis",
+    date: "Apr – Jun 2020",
+    desc: "Training programme in Applied Transactional Analysis.",
+  },
+  {
+    img: "/certs/personal-counselling.jpg",
+    title: "Certificate in Personal Counselling",
+    date: "Feb – Apr 2020",
+    desc: "Training in personal counselling based on Robert Carkhuff's Model of Counselling.",
+  },
+];
+
+const EXP_POINTS = [
+  "Client assessments and personalised treatment plans for individuals, couples, families, children and teenagers.",
+  "Psychotherapy drawing on cognitive-behavioural, client-centred and play-therapy approaches.",
+  "Trauma work using imagery and relaxation techniques to build strengthening and safe zones.",
+  "Support with anxiety, depression, anger, relationship issues, substance abuse and career concerns.",
+  "Psychological assessments for adults and children, plus workshops and outreach programmes.",
+  "Over 10 years of nutrition and wellness guidance alongside counselling.",
+];
+
+const EXP_SKILLS = [
+  "Trauma & PTSD",
+  "Crisis counselling",
+  "Family counselling",
+  "Relationship issues",
+  "Anxiety assessment",
+  "Mindfulness-based therapy",
+  "Emotion-focused therapy",
+  "Behaviour analysis",
+  "Relaxation techniques",
+  "Nutrition & wellness",
+];
+
+// TEMPORARY: set to true to bring back the Book a session buttons
+const SHOW_BOOKING = false;
+
 export default function Landing() {
   const { session } = useAuth();
   const navigate = useNavigate();
   const [showBooking, setShowBooking] = useState(false);
+  const [cert, setCert] = useState(null);
+  const [activeCert, setActiveCert] = useState(0);
+
+  useEffect(() => {
+    if (!cert) return;
+    const onKey = (e) => e.key === "Escape" && setCert(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [cert]);
 
   function openBooking() {
     if (!session) {
@@ -26,8 +98,13 @@ export default function Landing() {
       <header className="cs-hero">
         <div className="cs-hero-inner">
           <div>
-            <div className="cs-eyebrow">
-              <Sparkles size={14} /> Trusted by a community of 14.8K+
+            <div className="cs-eyebrow-row">
+              <div className="cs-eyebrow">
+                <Sparkles size={14} /> Trusted by a community of 14.8K+
+              </div>
+              <div className="cs-eyebrow cs-eyebrow-amber">
+                <Award size={14} /> 1500+ cases handled
+              </div>
             </div>
             <h1>A space to feel clear again.</h1>
             <p className="lead">
@@ -35,9 +112,11 @@ export default function Landing() {
               relationships, your habits, your nervous system. Sessions are online, private, and paced to you.
             </p>
             <div className="cs-hero-ctas">
-              <button className="cs-btn cs-btn-amber" onClick={openBooking}>
-                Book a session
-              </button>
+              {SHOW_BOOKING && (
+                <button className="cs-btn cs-btn-amber" onClick={openBooking}>
+                  Book a session
+                </button>
+              )}
               <a href="#fees" className="cs-btn cs-btn-ghost-light">
                 See pricing
               </a>
@@ -77,6 +156,10 @@ export default function Landing() {
             </p>
             <div className="cs-stat-row">
               <div className="cs-stat">
+                <b>1500+</b>
+                <span>Cases handled</span>
+              </div>
+              <div className="cs-stat">
                 <b>354</b>
                 <span>Posts &amp; resources shared</span>
               </div>
@@ -88,6 +171,97 @@ export default function Landing() {
                 <b>4</b>
                 <span>Areas of focus</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="cs-section cs-witness" id="witnessed">
+        <div className="cs-container">
+          <div className="cs-witness-head">
+            <div className="cs-kicker">Our approach</div>
+            <h2 className="cs-h2">Witnessed Holistic Healing</h2>
+            <p className="cs-witness-lead">At Clearspaces, we see the person behind the problem.</p>
+          </div>
+
+          <div className="cs-witness-intro">
+            <div className="cs-witness-eye">
+              <Eye size={26} />
+            </div>
+            <p>
+              We believe that every behaviour has a story, and every emotional struggle has a deeper context.
+              At Clearspaces, our approach to therapy begins with one essential act: witnessing the person.
+              We believe that healing begins when a person feels genuinely seen, heard, and understood, not
+              judged by their behaviours, defined by their struggles, or reduced to a diagnosis.
+            </p>
+          </div>
+
+          <div className="cs-witness-cards">
+            <div className="cs-witness-card">
+              <div className="cs-witness-icon"><Layers size={20} /></div>
+              <p>
+                Rather than focusing only on your symptoms, we explore what may lie beneath them. By
+                understanding how your past experiences influence your present emotions, relationships, and
+                responses, we begin to make sense of your struggles.
+              </p>
+            </div>
+            <div className="cs-witness-card">
+              <div className="cs-witness-icon"><HeartHandshake size={20} /></div>
+              <p>
+                Using a holistic, trauma-informed approach, we integrate nervous system regulation, childhood
+                emotional healing, and parts work to help you develop deeper self-understanding and healthier
+                ways of coping.
+              </p>
+              <div className="cs-witness-tags">
+                <span>Nervous system regulation</span>
+                <span>Childhood emotional healing</span>
+                <span>Parts work</span>
+              </div>
+            </div>
+            <div className="cs-witness-card">
+              <div className="cs-witness-icon"><Compass size={20} /></div>
+              <p>
+                Every individual is unique, and so is their healing journey. We create a tailor-made therapy
+                plan based on your experiences, needs, and pace.
+              </p>
+            </div>
+          </div>
+
+          <div className="cs-witness-ask">
+            <div className="cs-witness-ask-side cs-ask-no">
+              <small>We don&rsquo;t begin by asking</small>
+              <p>&ldquo;What&rsquo;s wrong with you?&rdquo;</p>
+            </div>
+            <div className="cs-witness-ask-side cs-ask-yes">
+              <small>We begin by asking</small>
+              <p>&ldquo;What have you been through, and what do you need to heal?&rdquo;</p>
+            </div>
+          </div>
+
+          <div className="cs-witness-close">
+            <blockquote>Because healing begins when you feel seen, heard, and understood.</blockquote>
+            <span>Clear Spaces &mdash; A space to understand yourself, heal, and grow.</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="cs-section cs-issues" id="issues">
+        <div className="cs-container">
+          <div className="cs-issues-head">
+            <div className="cs-kicker">Why people reach out</div>
+            <h2 className="cs-h2">The most common issues people come to Munira with</h2>
+          </div>
+          <div className="cs-issues-grid">
+            {COMMON_ISSUES.map(({ t, Icon }) => (
+              <div className="cs-issue" key={t}>
+                <div className="cs-issue-icon">
+                  <Icon size={22} />
+                </div>
+                <b>{t}</b>
+              </div>
+            ))}
+            <div className="cs-issue cs-issue-note">
+              <p>Whatever brings you here, you don&rsquo;t need the right words to begin.</p>
             </div>
           </div>
         </div>
@@ -128,7 +302,154 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="cs-section" id="fees">
+      <section className="cs-section" id="experience">
+        <div className="cs-container">
+          <div className="cs-kicker">Experience &amp; credentials</div>
+          <h2 className="cs-h2">Trained, certified and practising since 2021</h2>
+          <p className="cs-body-text" style={{ marginBottom: 34 }}>
+            Munira Shakir is a clinical psychologist and integrative counsellor based in Hyderabad, with
+            formal training in psychology and counselling from the Institute of Human Technology and a
+            background in nutrition and wellness.
+          </p>
+
+          <div className="cs-exp-grid">
+            <div className="cs-exp-card">
+              <div className="cs-exp-card-head">
+                <div className="cs-exp-icon"><Briefcase size={20} /></div>
+                <div>
+                  <small>Jan 2021 &ndash; Present</small>
+                  <h3>Integrative Counsellor</h3>
+                  <span>ClearSpaces, Hyderabad, India</span>
+                </div>
+              </div>
+              <ul className="cs-exp-list">
+                {EXP_POINTS.map((t) => (
+                  <li key={t}>
+                    <Check size={15} color="#0146c7" /> <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="cs-exp-skills">
+                {EXP_SKILLS.map((t) => (
+                  <span key={t}>{t}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="cs-exp-card">
+              <div className="cs-exp-card-head">
+                <div className="cs-exp-icon"><GraduationCap size={20} /></div>
+                <div>
+                  <small>Education</small>
+                  <h3>Qualifications</h3>
+                </div>
+              </div>
+              <div className="cs-timeline">
+                {[
+                  {
+                    d: "Mar 2021",
+                    t: "Specialist in Psychology",
+                    s: "Clinical Psychology",
+                    o: "Institute of Human Technology, Mumbai",
+                  },
+                  {
+                    d: "Mar 2021",
+                    t: "Integrative Counselling",
+                    s: "Counselling Psychology",
+                    o: "Institute of Human Technology, Mumbai",
+                  },
+                  {
+                    d: "Aug 2010",
+                    t: "Principles of Nutrition",
+                    s: "Nutrition Sciences",
+                    o: "Nutrilite Health Institute, California, USA",
+                  },
+                ].map((e) => (
+                  <div className="cs-timeline-item" key={e.t}>
+                    <i />
+                    <small>{e.d}</small>
+                    <b>{e.t}</b>
+                    <span>
+                      {e.s} &middot; {e.o}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="cs-certs-head">
+            <div className="cs-kicker">Certifications</div>
+            <h3 className="cs-certs-title">Verified training, on record</h3>
+            <p className="cs-body-text">
+              Issued by the Institute of Human Technology &mdash; Heart to Heart Counselling Centre, India.
+              Select a certificate to view it, or tap it to open full size.
+            </p>
+          </div>
+
+          <div className="cs-showcase">
+            <div className="cs-stage">
+              <button
+                type="button"
+                className="cs-stage-nav prev"
+                aria-label="Previous certificate"
+                onClick={() => setActiveCert((activeCert + CERTS.length - 1) % CERTS.length)}
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <button
+                type="button"
+                className="cs-stage-paper"
+                onClick={() => setCert(CERTS[activeCert])}
+                aria-label={"View " + CERTS[activeCert].title + " full size"}
+              >
+                <img
+                  key={CERTS[activeCert].img}
+                  src={CERTS[activeCert].img}
+                  alt={CERTS[activeCert].title}
+                  className={CERTS[activeCert].featured ? "portrait" : ""}
+                />
+                <span className="cs-cert-zoom"><ZoomIn size={16} /> View full size</span>
+              </button>
+              <button
+                type="button"
+                className="cs-stage-nav next"
+                aria-label="Next certificate"
+                onClick={() => setActiveCert((activeCert + 1) % CERTS.length)}
+              >
+                <ChevronRight size={22} />
+              </button>
+            </div>
+
+            <div className="cs-cert-side">
+              <div className="cs-cert-detail">
+                <small><Award size={13} /> {CERTS[activeCert].date}</small>
+                <h4>{CERTS[activeCert].title}</h4>
+                <p>{CERTS[activeCert].desc}</p>
+                <span className="cs-cert-issuer">Institute of Human Technology, India</span>
+              </div>
+              <div className="cs-cert-list">
+                {CERTS.map((c, i) => (
+                  <button
+                    type="button"
+                    key={c.title}
+                    className={"cs-cert-item" + (i === activeCert ? " active" : "")}
+                    onClick={() => setActiveCert(i)}
+                  >
+                    <img src={c.img} alt="" loading="lazy" />
+                    <span>
+                      <b>{c.title}</b>
+                      <em>{c.date}</em>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="cs-section cs-section-soft" id="fees">
         <div className="cs-container">
           <div className="cs-kicker">Sessions &amp; fees</div>
           <h2 className="cs-h2">One simple rule: the sooner you need it, the more it costs</h2>
@@ -177,13 +498,15 @@ export default function Landing() {
               </ul>
             </div>
           </div>
-          <button className="cs-btn cs-btn-amber" style={{ marginTop: 24 }} onClick={openBooking}>
-            Book a session
-          </button>
+          {SHOW_BOOKING && (
+            <button className="cs-btn cs-btn-amber" style={{ marginTop: 24 }} onClick={openBooking}>
+              Book a session
+            </button>
+          )}
         </div>
       </section>
 
-      <section className="cs-section cs-section-soft" id="how">
+      <section className="cs-section" id="how">
         <div className="cs-container">
           <div className="cs-kicker">How booking works</div>
           <h2 className="cs-h2">Simple by design — no payment gateway, no back-and-forth</h2>
@@ -215,7 +538,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="cs-section">
+      <section className="cs-section cs-section-soft">
         <div className="cs-container">
           <div className="cs-kicker">From past sessions</div>
           <h2 className="cs-h2">What clients have shared</h2>
@@ -290,6 +613,18 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {cert && (
+        <div className="cs-lightbox" onClick={() => setCert(null)} role="dialog" aria-modal="true">
+          <button type="button" className="cs-lightbox-close" aria-label="Close" onClick={() => setCert(null)}>
+            <X size={22} />
+          </button>
+          <figure onClick={(e) => e.stopPropagation()}>
+            <img src={cert.img} alt={cert.title} />
+            <figcaption>{cert.title} &middot; {cert.date}</figcaption>
+          </figure>
+        </div>
+      )}
 
       {showBooking && <BookingModal onClose={() => setShowBooking(false)} />}
     </>

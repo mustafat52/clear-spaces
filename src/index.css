@@ -306,11 +306,10 @@ a.cs-btn {
   overflow: hidden;
 }
 .cs-portrait img {
-  width: 82%;
-  height: auto;
-  border-radius: 22px;
-  background: #fff;
-  box-shadow: 0 14px 36px rgba(12, 43, 89, 0.12);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
 }
 .cs-stat-row {
   display: flex;

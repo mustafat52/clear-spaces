@@ -195,7 +195,7 @@ export default function Landing() {
       <section className="cs-section" id="about">
         <div className="cs-container cs-about-grid">
           <div className="cs-portrait">
-            <img src="/logo-full.png" alt="Clearspaces — Witnessed Holistic Healing" />
+            <img src="/munira.jpg" alt="Munira Shakir, integrative counsellor at Clearspaces" />
           </div>
           <div>
             <div className="cs-kicker">About Munira</div>

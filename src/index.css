@@ -62,13 +62,16 @@ img {
   align-items: center;
   gap: 11px;
 }
+.cs-nav-brand img {
+  border-radius: 50%;
+}
 .cs-nav-brand-text {
   display: flex;
   flex-direction: column;
   line-height: 1.15;
 }
 .cs-nav-brand-text b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 18px;
   color: var(--navy);
   font-weight: 600;
@@ -213,7 +216,7 @@ a.cs-btn {
   margin-bottom: 22px;
 }
 .cs-hero h1 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 47px;
   line-height: 1.12;
@@ -255,9 +258,10 @@ a.cs-btn {
 }
 .cs-hero-logo img {
   width: 340px;
+  max-width: 100%;
   height: auto;
-  border-radius: 28px;
-  background: #fff;
+  border-radius: 20px;
+  border: 4px solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
 }
 
@@ -275,7 +279,7 @@ a.cs-btn {
   margin-bottom: 10px;
 }
 .cs-h2 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 32px;
   color: var(--navy);
@@ -306,10 +310,8 @@ a.cs-btn {
   overflow: hidden;
 }
 .cs-portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  width: 72%;
+  border-radius: 50%;
 }
 .cs-stat-row {
   display: flex;
@@ -318,7 +320,7 @@ a.cs-btn {
   flex-wrap: wrap;
 }
 .cs-stat b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 26px;
   color: var(--navy);
   display: block;
@@ -340,7 +342,7 @@ a.cs-btn {
   border-bottom: 1px solid var(--line);
 }
 .cs-specialty-row h3 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 20px;
   margin: 0 0 6px;
@@ -365,272 +367,61 @@ a.cs-btn {
 }
 
 /* ---------------- FEES ---------------- */
-.cs-fees-head {
-  max-width: 640px;
-  margin-bottom: 40px;
-}
-.cs-fees-head .cs-h2 {
-  max-width: none;
-}
-.cs-plan-grid {
+.cs-fee-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  align-items: stretch;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
-.cs-plan {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+.cs-fee-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+@media (max-width: 760px) {
+  .cs-fee-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+.cs-fee-card {
+  border-radius: 16px;
+  padding: 30px;
   background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 30px 28px 28px;
-  box-shadow: 0 10px 30px rgba(12, 43, 89, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1.5px solid var(--line);
 }
-.cs-plan:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px rgba(12, 43, 89, 0.12);
-}
-.cs-plan-priority {
-  border: 1.5px solid var(--blue);
-  box-shadow: 0 14px 36px rgba(1, 70, 199, 0.14);
-}
-.cs-plan-tag {
-  position: absolute;
-  top: -12px;
-  right: 24px;
-  background: var(--amber);
-  color: #33240a;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  padding: 5px 13px;
-  border-radius: 20px;
-  box-shadow: 0 6px 14px rgba(250, 166, 6, 0.35);
-}
-.cs-plan-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.cs-plan-icon {
-  flex: 0 0 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: var(--sky-pale);
-  color: var(--blue);
-  display: grid;
-  place-items: center;
-}
-.cs-plan-priority .cs-plan-icon {
-  background: linear-gradient(135deg, var(--sky), var(--blue));
+.cs-fee-card.urgent {
+  background: linear-gradient(160deg, #0c2b59, #0146c7);
   color: #fff;
+  border-color: transparent;
 }
-.cs-plan-top h3 {
-  font-family: "Lora", Georgia, serif;
-  font-weight: 500;
-  font-size: 21px;
-  color: var(--navy);
-  margin: 0;
-}
-.cs-plan-price {
-  margin: 24px 0 12px;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.cs-plan-price b {
-  font-family: "Lora", Georgia, serif;
-  font-weight: 500;
-  font-size: 44px;
-  line-height: 1;
+.cs-fee-card .price {
+  font-family: "Fraunces", serif;
+  font-size: 38px;
+  margin: 10px 0 6px;
   color: var(--navy);
 }
-.cs-plan-price span {
-  font-size: 13.5px;
-  color: var(--text-muted);
+.cs-fee-card.urgent .price {
+  color: var(--amber-soft);
 }
-.cs-plan-length {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--blue);
-  background: var(--sky-mist);
-  border: 1px solid var(--sky-pale);
-  padding: 5px 12px;
-  border-radius: 20px;
-}
-.cs-plan-desc {
+.cs-fee-card ul {
   margin: 18px 0 0;
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: var(--text-muted);
-}
-.cs-plan ul {
-  list-style: none;
-  margin: 18px 0 26px;
-  padding: 18px 0 0;
-  border-top: 1px solid var(--line);
-  display: grid;
-  gap: 10px;
-  flex: 1;
-  align-content: start;
-}
-.cs-plan li {
-  display: flex;
-  gap: 10px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text);
-}
-.cs-plan li svg {
-  flex: 0 0 15px;
-  margin-top: 3px;
-  color: var(--blue);
-}
-.cs-plan-cta {
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14.5px;
-  color: var(--navy);
-  border: 1.5px solid var(--navy);
-  border-radius: 10px;
-  padding: 11px 16px;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.cs-plan-cta:hover {
-  background: var(--navy);
-  color: #fff;
-}
-.cs-plan-priority .cs-plan-cta {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: #fff;
-}
-.cs-plan-priority .cs-plan-cta:hover {
-  background: #0139a8;
-  border-color: #0139a8;
-}
-
-.cs-package {
-  position: relative;
-  overflow: hidden;
-  margin-top: 26px;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 32px;
-  align-items: center;
-  background: linear-gradient(135deg, var(--navy-deep), var(--navy) 50%, var(--blue));
-  color: #fff;
-  border-radius: 24px;
-  padding: 38px 42px;
-  box-shadow: 0 18px 44px rgba(8, 31, 67, 0.28);
-}
-.cs-package::after {
-  content: "";
-  position: absolute;
-  right: -120px;
-  top: -140px;
-  width: 360px;
-  height: 360px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(1, 177, 253, 0.32), transparent 68%);
-  pointer-events: none;
-}
-.cs-package-main,
-.cs-package-side {
-  position: relative;
-  z-index: 1;
-}
-.cs-package-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--amber-soft);
-  margin-bottom: 10px;
-}
-.cs-package h3 {
-  font-family: "Lora", Georgia, serif;
-  font-weight: 500;
-  font-size: 30px;
-  margin: 0 0 8px;
-}
-.cs-package-main > p {
-  margin: 0 0 18px;
-  font-size: 15.5px;
-  line-height: 1.65;
-  color: #cfe3f7;
-  max-width: 480px;
-}
-.cs-package ul {
-  list-style: none;
-  margin: 0;
   padding: 0;
-  display: grid;
-  gap: 10px;
+  list-style: none;
 }
-.cs-package li {
+.cs-fee-card li {
   display: flex;
-  gap: 10px;
-  font-size: 14.5px;
-  line-height: 1.5;
-  color: #e6f0fb;
-}
-.cs-package li svg {
-  flex: 0 0 16px;
-  margin-top: 2px;
-  color: var(--amber-soft);
-}
-.cs-package-side {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 18px;
-  padding: 28px 22px;
-}
-.cs-package-price b {
-  display: block;
-  font-family: "Lora", Georgia, serif;
-  font-weight: 500;
-  font-size: 50px;
-  line-height: 1;
-  color: var(--amber-soft);
-}
-.cs-package-price span {
-  display: block;
-  margin: 8px 0 20px;
+  gap: 9px;
   font-size: 14px;
-  color: #a9c6e6;
-}
-.cs-fees-note {
-  margin: 26px 0 0;
-  text-align: center;
-  font-size: 14.5px;
+  padding: 6px 0;
+  align-items: flex-start;
   color: var(--text-muted);
 }
-@media (max-width: 960px) {
-  .cs-plan-grid {
-    grid-template-columns: 1fr;
-    max-width: 520px;
-    margin: 0 auto;
-  }
-  .cs-package {
-    grid-template-columns: 1fr;
-    padding: 30px 24px;
-    gap: 24px;
-  }
+.cs-fee-card.urgent li {
+  color: #cfe3f7;
+}
+.cs-fee-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.cs-fee-card.urgent .cs-fee-sub {
+  color: #a9c6e6;
 }
 
 /* ---------------- STEPS ---------------- */
@@ -640,13 +431,13 @@ a.cs-btn {
   gap: 28px;
 }
 .cs-step-num {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 15px;
   color: var(--amber);
   margin-bottom: 14px;
 }
 .cs-step-card h4 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 18px;
   margin: 0 0 8px;
@@ -793,7 +584,7 @@ a.cs-btn {
   padding: 22px 26px 26px;
 }
 .cs-modal-title {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 22px;
   color: var(--navy);
   margin: 0 0 6px;
@@ -826,12 +617,12 @@ a.cs-btn {
   align-items: center;
 }
 .cs-type-card-top b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 17px;
   color: var(--navy);
 }
 .cs-type-card-top .amt {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 19px;
   color: var(--blue);
 }
@@ -891,7 +682,7 @@ a.cs-btn {
   margin-top: 4px;
 }
 .cs-day-pill .dom {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 17px;
   display: block;
   margin-top: 2px;
@@ -994,7 +785,7 @@ a.cs-btn {
   margin-bottom: 18px;
 }
 .cs-pay-amt {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 15px;
   color: var(--text-muted);
   margin-bottom: 4px;
@@ -1117,7 +908,7 @@ a.cs-btn {
   text-align: right;
 }
 .cs-admin-stat b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 24px;
   color: var(--navy);
   display: block;
@@ -1164,7 +955,7 @@ a.cs-btn {
   font-weight: 600;
 }
 .cs-admin-section-title {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 16px;
   color: var(--navy);
   font-weight: 500;
@@ -1196,13 +987,13 @@ a.cs-btn {
   gap: 8px 10px;
 }
 .cs-req-top b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 16px;
   color: var(--navy);
   margin-right: 10px;
 }
 .cs-req-amt {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 16px;
   color: var(--blue);
 }
@@ -1349,7 +1140,7 @@ a.cs-btn {
   box-shadow: 0 20px 50px rgba(12, 43, 89, 0.08);
 }
 .cs-auth-title {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 23px;
   color: var(--navy);
@@ -1441,7 +1232,7 @@ a.cs-btn {
   margin-bottom: 18px;
 }
 .cs-cal-header b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 18px;
   color: var(--navy);
   min-width: 160px;
@@ -1561,7 +1352,9 @@ a.cs-btn {
   }
   .cs-hero-logo img {
     width: 240px;
+    height: auto;
   }
+  .cs-fee-grid,
   .cs-steps,
   .cs-quote-grid {
     grid-template-columns: 1fr;
@@ -1652,7 +1445,7 @@ a.cs-btn {
   margin-bottom: 12px;
 }
 .cs-witness-lead {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 21px;
   color: var(--blue);
   margin: 0;
@@ -1754,7 +1547,7 @@ a.cs-btn {
 }
 .cs-witness-ask-side p {
   margin: 0;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 23px;
   line-height: 1.35;
 }
@@ -1788,7 +1581,7 @@ a.cs-btn {
 .cs-witness-close blockquote {
   margin: 0 auto 14px;
   max-width: 640px;
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-size: 28px;
   line-height: 1.35;
 }
@@ -1852,7 +1645,7 @@ a.cs-btn {
   text-transform: uppercase;
 }
 .cs-exp-card-head h3 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 22px;
   color: var(--navy);
@@ -1947,7 +1740,7 @@ a.cs-btn {
   margin-bottom: 26px;
 }
 .cs-certs-title {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 26px;
   color: var(--navy);
@@ -2067,7 +1860,7 @@ a.cs-btn {
   text-transform: uppercase;
 }
 .cs-cert-detail h4 {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 22px;
   line-height: 1.3;
@@ -2264,7 +2057,7 @@ a.cs-btn {
   place-items: center;
 }
 .cs-issue b {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Fraunces", serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 1.25;
@@ -2386,103 +2179,5 @@ a.cs-btn {
   }
   .cs-nav-wa {
     display: none;
-  }
-}
-.cs-package-side .cs-btn {
-  gap: 8px;
-  justify-content: center;
-}
-
-/* ---------------- MOBILE POLISH ---------------- */
-.cs-nav-brand-text b,
-.cs-nav-brand-text span {
-  white-space: nowrap;
-}
-.cs-nav > div:last-child {
-  flex-shrink: 0;
-}
-.cs-nav-insta {
-  flex: 0 0 36px;
-}
-.cs-btn-wa {
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.cs-footer-top a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-}
-
-@media (max-width: 860px) {
-  .cs-nav {
-    padding: 14px 20px;
-  }
-  /* a.cs-btn outranks .cs-nav-wa, so the earlier hide rule never applied */
-  a.cs-nav-wa {
-    padding: 9px 13px;
-    font-size: 13px;
-    white-space: nowrap;
-  }
-  .cs-nav .cs-nav-brand-text span {
-    display: none;
-  }
-  .cs-mobile-menu {
-    top: 76px;
-    overflow-y: auto;
-  }
-  .cs-witness-eye,
-  .cs-book-icon {
-    width: 56px;
-    height: 56px;
-  }
-  .cs-book-icon {
-    width: 68px;
-    height: 68px;
-  }
-  .cs-hero-credentials span:not(:last-child)::after {
-    display: none;
-  }
-  .cs-hero-credentials span {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    padding: 4px 11px;
-    border-radius: 16px;
-  }
-  .cs-hero-credentials {
-    gap: 8px;
-  }
-  .cs-stat-row {
-    gap: 22px 28px;
-  }
-}
-@media (max-width: 540px) {
-  a.cs-nav-wa {
-    display: none; /* the hero and menu already offer booking */
-  }
-  .cs-nav-brand-text b {
-    font-size: 17px;
-  }
-  .cs-container {
-    padding: 0 20px;
-  }
-  .cs-hero-inner {
-    padding: 0 20px;
-  }
-  .cs-hero {
-    padding: 40px 0 64px;
-  }
-  .cs-book {
-    padding: 28px 18px;
-  }
-  .cs-btn-wa {
-    width: 100%;
-  }
-  .cs-hero-ctas .cs-btn {
-    flex: 1 1 auto;
-    justify-content: center;
   }
 }

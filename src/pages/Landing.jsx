@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Check, Clock, CalendarCheck, Star, Package, Sparkles, Award, ChevronLeft, ChevronRight, Ghost, Zap, CloudLightning, HelpCircle, HeartCrack, Link2, Users, Briefcase, GraduationCap, ZoomIn, X, Eye, HeartHandshake, Layers, Compass, MessageCircle, Youtube, Instagram, LayoutDashboard } from "lucide-react";
+import { Check, Sparkles, Award, ChevronLeft, ChevronRight, Ghost, Zap, CloudLightning, HelpCircle, HeartCrack, Link2, Users, Briefcase, GraduationCap, ZoomIn, X, Eye, HeartHandshake, Layers, Compass, MessageCircle, Youtube, Instagram, LayoutDashboard } from "lucide-react";
 import Logo from "../components/Logo";
 import SiteNav from "../components/SiteNav";
-import { managerBookingLink } from "../lib/whatsapp";
+import { managerBookingLink, MANAGER_WHATSAPP_DISPLAY } from "../lib/whatsapp";
 
 const COMMON_ISSUES = [
   { t: "Fears", Icon: Ghost },
@@ -14,103 +14,33 @@ const COMMON_ISSUES = [
   { t: "Dysfunctional Relationships", Icon: Users },
 ];
 
-const IHT = "Institute of Human Technology, India";
-
-// Listed oldest to newest.
 const CERTS = [
   {
-    img: "/certs/nutrition-advisor.jpg",
-    title: "Principles of Nutrition — Nutrition & Wellness Advisor",
-    date: "2015",
-    issuer: "Nutrilite Health Institute, California, USA",
-    desc: "Certificate course in the Principles of Nutrition, with certification as a Nutrition & Wellness Advisor.",
-  },
-  {
-    img: "/certs/graphology-danger-signs.jpg",
-    title: "Expert Graphology — Specialization in Danger Signs",
-    date: "2018",
-    issuer: "World School of Handwriting, Navi Mumbai, India",
-    desc: "Expert Graphology level, specialising in the reading of danger signs in handwriting and signature analysis.",
-  },
-  {
-    img: "/certs/personal-counselling.jpg",
-    title: "Certificate in Personal Counselling",
-    date: "Feb – Apr 2020",
-    issuer: IHT,
-    desc: "Training in personal counselling based on Robert Carkhuff's Model of Counselling.",
-  },
-  {
-    img: "/certs/applied-transactional-analysis.jpg",
-    title: "Certificate in Applied Transactional Analysis",
-    date: "Apr – Jun 2020",
-    issuer: IHT,
-    desc: "Training programme in Applied Transactional Analysis.",
+    img: "/certs/diploma-integrative-counselling.jpg",
+    title: "Diploma in Integrative Counselling",
+    date: "March 2021",
+    desc: "150 hours of training in an integrative approach to counselling skills, theory and practice — Carkhuff's Model, Rational Emotive Behaviour Therapy and Transactional Analysis.",
+    featured: true,
   },
   {
     img: "/certs/rebt-counselling.jpg",
     title: "Certificate in Counselling",
     date: "Jan – Mar 2021",
-    issuer: IHT,
     desc: "Advanced training in Rational Emotive Behaviour Therapy.",
   },
   {
-    img: "/certs/diploma-integrative-counselling.jpg",
-    title: "Diploma in Integrative Counselling",
-    date: "March 2021",
-    issuer: IHT,
-    desc: "150 hours of training in an integrative approach to counselling skills, theory and practice — Carkhuff's Model, Rational Emotive Behaviour Therapy and Transactional Analysis.",
-    featured: true,
+    img: "/certs/applied-transactional-analysis.jpg",
+    title: "Certificate in Applied Transactional Analysis",
+    date: "Apr – Jun 2020",
+    desc: "Training programme in Applied Transactional Analysis.",
+  },
+  {
+    img: "/certs/personal-counselling.jpg",
+    title: "Certificate in Personal Counselling",
+    date: "Feb – Apr 2020",
+    desc: "Training in personal counselling based on Robert Carkhuff's Model of Counselling.",
   },
 ];
-
-const PLANS = [
-  {
-    key: "consultation",
-    name: "Consultation",
-    Icon: MessageCircle,
-    price: "₹500",
-    unit: "per consultation",
-    length: "15 minutes",
-    desc: "A short introductory conversation to share what's on your mind and see how we can help.",
-    points: ["A relaxed first step, no preparation needed", "Understand the approach before you commit"],
-    message: "Hello, I'd like to book a Consultation (15 minutes) at Clearspaces.",
-  },
-  {
-    key: "session",
-    name: "Session",
-    Icon: CalendarCheck,
-    price: "₹2,000",
-    unit: "per session",
-    length: "1 hour",
-    desc: "A full one-on-one counselling session, held online and paced to what you need.",
-    points: ["One hour, fully private and confidential", "Trauma-informed, integrative counselling"],
-    message: "Hello, I'd like to book a Session (1 hour) at Clearspaces.",
-  },
-  {
-    key: "priority",
-    name: "Priority Session",
-    Icon: Star,
-    price: "₹3,000",
-    unit: "per session",
-    length: "1 hour",
-    desc: "The same one-hour session, with priority given to your booking when you need it sooner.",
-    points: ["Priority scheduling for your appointment", "One hour, fully private and confidential"],
-    message: "Hello, I'd like to book a Priority Session (1 hour) at Clearspaces.",
-    tag: "Priority booking",
-  },
-];
-
-const PACKAGE = {
-  name: "5-Session Package",
-  price: "₹10,000",
-  desc: "Built for regular, continuous sessions, rather than booking each one separately.",
-  points: [
-    "Five one-hour counselling sessions",
-    "Priority for booking your sessions",
-    "Appointments planned in advance around your preferred availability",
-  ],
-  message: "Hello, I'd like to book the 5-Session Package (₹10,000) at Clearspaces.",
-};
 
 const EXP_POINTS = [
   "Personalised therapy plans for individuals, couples, families, children and teenagers.",
@@ -187,7 +117,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="cs-hero-logo">
-            <img src="/logo-full.png" alt="Clearspaces — Witnessed Holistic Healing" />
+            <img src="/munira.png" alt="Munira Shakir, Clearspaces" />
           </div>
         </div>
       </header>
@@ -195,7 +125,7 @@ export default function Landing() {
       <section className="cs-section" id="about">
         <div className="cs-container cs-about-grid">
           <div className="cs-portrait">
-            <img src="/munira.jpg" alt="Munira Shakir, integrative counsellor at Clearspaces" />
+            <img src="/logo.png" alt="Clearspaces" />
           </div>
           <div>
             <div className="cs-kicker">About Munira</div>
@@ -221,7 +151,7 @@ export default function Landing() {
                 <span>Followers on Instagram</span>
               </div>
               <div className="cs-stat">
-                <b>367</b>
+                <b>354</b>
                 <span>Posts &amp; resources shared</span>
               </div>
             </div>
@@ -357,9 +287,9 @@ export default function Landing() {
       <section className="cs-section" id="experience">
         <div className="cs-container">
           <div className="cs-kicker">Experience &amp; credentials</div>
-          <h2 className="cs-h2">Trained, certified and practising since 2015</h2>
+          <h2 className="cs-h2">Trained, certified and practising since 2021</h2>
           <p className="cs-body-text" style={{ marginBottom: 34 }}>
-            Munira Shakir is a integrative counsellor based in Secunderabad, with
+            Munira Shakir is a clinical psychologist and integrative counsellor based in Secunderabad, with
             formal training in psychology and counselling from the Institute of Human Technology and a
             background in nutrition and wellness.
           </p>
@@ -399,22 +329,22 @@ export default function Landing() {
               <div className="cs-timeline">
                 {[
                   {
-                    d: "2015",
-                    t: "Principles of Nutrition",
-                    s: "Nutrition & Wellness Advisor",
-                    o: "Nutrilite Health Institute, California, USA",
-                  },
-                  {
-                    d: "2018",
-                    t: "Expert Graphology",
-                    s: "Specialization in Danger Signs",
-                    o: "World School of Handwriting, Navi Mumbai",
+                    d: "Mar 2021",
+                    t: "Specialist in Psychology",
+                    s: "Clinical Psychology",
+                    o: "Institute of Human Technology, Mumbai",
                   },
                   {
                     d: "Mar 2021",
                     t: "Integrative Counselling",
                     s: "Counselling Psychology",
                     o: "Institute of Human Technology, Mumbai",
+                  },
+                  {
+                    d: "Aug 2010",
+                    t: "Principles of Nutrition",
+                    s: "Nutrition Sciences",
+                    o: "Nutrilite Health Institute, California, USA",
                   },
                 ].map((e) => (
                   <div className="cs-timeline-item" key={e.t}>
@@ -434,7 +364,7 @@ export default function Landing() {
             <div className="cs-kicker">Certifications</div>
             <h3 className="cs-certs-title">Verified training, on record</h3>
             <p className="cs-body-text">
-              Listed in order, from earliest to most recent.
+              Issued by the Institute of Human Technology &mdash; Heart to Heart Counselling Centre, India.
               Select a certificate to view it, or tap it to open full size.
             </p>
           </div>
@@ -478,7 +408,7 @@ export default function Landing() {
                 <small><Award size={13} /> {CERTS[activeCert].date}</small>
                 <h4>{CERTS[activeCert].title}</h4>
                 <p>{CERTS[activeCert].desc}</p>
-                <span className="cs-cert-issuer">{CERTS[activeCert].issuer}</span>
+                <span className="cs-cert-issuer">Institute of Human Technology, India</span>
               </div>
               <div className="cs-cert-list">
                 {CERTS.map((c, i) => (
@@ -503,80 +433,62 @@ export default function Landing() {
 
       <section className="cs-section cs-section-soft" id="fees">
         <div className="cs-container">
-          <div className="cs-fees-head">
-            <div className="cs-kicker">Sessions &amp; fees</div>
-            <h2 className="cs-h2">Simple, transparent pricing</h2>
-            <p className="cs-body-text">
-              We offer consultations, sessions and therapies. Choose what fits where you are right now &mdash;
-              every appointment is held online and arranged personally over WhatsApp.
-            </p>
-          </div>
-
-          <div className="cs-plan-grid">
-            {PLANS.map(({ key, name, Icon, price, unit, length, desc, points, message, tag }) => (
-              <div className={"cs-plan" + (tag ? " cs-plan-priority" : "")} key={key}>
-                {tag && <span className="cs-plan-tag">{tag}</span>}
-                <div className="cs-plan-top">
-                  <div className="cs-plan-icon"><Icon size={20} /></div>
-                  <h3>{name}</h3>
-                </div>
-                <div className="cs-plan-price">
-                  <b>{price}</b>
-                  <span>{unit}</span>
-                </div>
-                <div className="cs-plan-length"><Clock size={14} /> {length}</div>
-                <p className="cs-plan-desc">{desc}</p>
-                <ul>
-                  {points.map((t) => (
-                    <li key={t}>
-                      <Check size={15} /> <span>{t}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  className="cs-plan-cta"
-                  href={managerBookingLink(message)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Book on WhatsApp
-                </a>
-              </div>
-            ))}
-          </div>
-
-          <div className="cs-package">
-            <div className="cs-package-main">
-              <div className="cs-package-label"><Package size={15} /> Best for continuity</div>
-              <h3>{PACKAGE.name}</h3>
-              <p>{PACKAGE.desc}</p>
+          <div className="cs-kicker">Sessions &amp; fees</div>
+          <h2 className="cs-h2">One simple rule: the sooner you need it, the more it costs</h2>
+          <p className="cs-body-text" style={{ marginBottom: 28 }}>
+            Every session is 50 minutes with Munira. Price is set automatically by how far out your chosen
+            date is — book further ahead and it costs less.
+          </p>
+          <div className="cs-fee-grid cs-fee-grid-3">
+            <div className="cs-fee-card urgent">
+              <div>Urgent</div>
+              <div className="price">₹4,500</div>
+              <div className="cs-fee-sub">Within the next 10 days</div>
               <ul>
-                {PACKAGE.points.map((t) => (
-                  <li key={t}>
-                    <Check size={16} /> <span>{t}</span>
-                  </li>
-                ))}
+                <li>
+                  <Check size={15} color="#fcc85e" /> For when things feel like they can't wait
+                </li>
+                <li>
+                  <Check size={15} color="#fcc85e" /> Reviewed by the team in real time
+                </li>
               </ul>
             </div>
-            <div className="cs-package-side">
-              <div className="cs-package-price">
-                <b>{PACKAGE.price}</b>
-                <span>for 5 sessions</span>
-              </div>
-              <a
-                className="cs-btn cs-btn-amber"
-                href={managerBookingLink(PACKAGE.message)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <MessageCircle size={17} /> Book the package
-              </a>
+            <div className="cs-fee-card">
+              <div>Priority</div>
+              <div className="price">₹2,500</div>
+              <div className="cs-fee-sub">11–25 days out</div>
+              <ul>
+                <li>
+                  <Check size={15} color="#0146c7" /> A good middle ground for planning ahead
+                </li>
+                <li>
+                  <Check size={15} color="#0146c7" /> Still gets priority scheduling attention
+                </li>
+              </ul>
+            </div>
+            <div className="cs-fee-card">
+              <div>Standard</div>
+              <div className="price">₹1,500</div>
+              <div className="cs-fee-sub">26+ days out</div>
+              <ul>
+                <li>
+                  <Check size={15} color="#0146c7" /> The most affordable way to book
+                </li>
+                <li>
+                  <Check size={15} color="#0146c7" /> Ideal for ongoing, planned sessions
+                </li>
+              </ul>
             </div>
           </div>
-
-          <p className="cs-fees-note">
-            Not sure where to begin? Start with a 15-minute consultation &mdash; we&rsquo;ll help you find the right fit.
-          </p>
+          <a
+            className="cs-btn cs-btn-amber"
+            style={{ marginTop: 24 }}
+            href={managerBookingLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <MessageCircle size={17} /> Book on WhatsApp
+          </a>
         </div>
       </section>
 
@@ -601,6 +513,7 @@ export default function Landing() {
               rel="noopener noreferrer"
             >
               <MessageCircle size={18} /> Chat on WhatsApp
+              <small>{MANAGER_WHATSAPP_DISPLAY}</small>
             </a>
           </div>
         </div>

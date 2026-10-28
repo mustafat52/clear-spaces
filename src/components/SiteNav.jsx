@@ -1,42 +1,29 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Instagram } from "lucide-react";
+import { Menu, X, Instagram, MessageCircle } from "lucide-react";
+import { managerBookingLink } from "../lib/whatsapp";
 import Logo from "./Logo";
-import { useAuth } from "../lib/auth";
-
-// TEMPORARY: set to true to bring back Log in / Book a session buttons
-const SHOW_BOOKING = false;
 
 const INSTAGRAM_URL = "https://www.instagram.com/counsellor__munira/";
 
-export default function SiteNav({ onBook }) {
-  const { session, isStaff, signOut } = useAuth();
+export default function SiteNav() {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-
-  async function handleLogout() {
-    await signOut();
-    navigate("/");
-  }
 
   return (
     <nav className="cs-nav">
-      <Link to="/" className="cs-nav-brand" style={{ textDecoration: "none" }}>
+      <a href="#" className="cs-nav-brand" style={{ textDecoration: "none" }}>
         <Logo size={44} />
         <div className="cs-nav-brand-text">
-          <b>ClearSpaces</b>
+          <b>Clearspaces</b>
           <span>Munira · Online Counselling</span>
         </div>
-      </Link>
+      </a>
 
       <div className="cs-nav-links">
-        <a href="/#about">About</a>
-        <a href="/#specialties">Specialties</a>
-        <a href="/#experience">Experience</a>
-        <a href="/#fees">Sessions &amp; fees</a>
-        <a href="/#how">How it works</a>
-        {session && !isStaff && <Link to="/dashboard">My sessions</Link>}
-        {isStaff && <Link to="/staff">Staff dashboard</Link>}
+        <a href="#about">About</a>
+        <a href="#specialties">Specialties</a>
+        <a href="#experience">Experience</a>
+        <a href="#fees">Sessions &amp; fees</a>
+        <a href="#book">Book a session</a>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -44,27 +31,19 @@ export default function SiteNav({ onBook }) {
           href={INSTAGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="ClearSpaces on Instagram"
+          aria-label="Clearspaces on Instagram"
           className="cs-nav-insta"
         >
           <Instagram size={19} />
         </a>
-        {SHOW_BOOKING && (
-          <>
-          {session ? (
-            <button className="cs-btn cs-btn-ghost" onClick={handleLogout}>
-              Log out
-            </button>
-          ) : (
-            <Link to="/login" className="cs-btn cs-btn-ghost" style={{ textDecoration: "none" }}>
-              Log in
-            </Link>
-          )}
-          <button className="cs-btn cs-btn-amber" onClick={onBook}>
-            Book a session
-          </button>
-          </>
-        )}
+        <a
+          className="cs-btn cs-btn-amber cs-nav-wa"
+          href={managerBookingLink()}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <MessageCircle size={16} /> Book on WhatsApp
+        </a>
         <button className="cs-hamburger" aria-label="Menu" onClick={() => setOpen(!open)}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -72,22 +51,11 @@ export default function SiteNav({ onBook }) {
 
       {open && (
         <div className="cs-mobile-menu">
-          <a href="/#about" onClick={() => setOpen(false)}>About</a>
-          <a href="/#specialties" onClick={() => setOpen(false)}>Specialties</a>
-          <a href="/#experience" onClick={() => setOpen(false)}>Experience</a>
-          <a href="/#fees" onClick={() => setOpen(false)}>Sessions &amp; fees</a>
-          <a href="/#how" onClick={() => setOpen(false)}>How it works</a>
-          {session && !isStaff && (
-            <Link to="/dashboard" onClick={() => setOpen(false)}>My sessions</Link>
-          )}
-          {isStaff && (
-            <Link to="/staff" onClick={() => setOpen(false)}>Staff dashboard</Link>
-          )}
-          {SHOW_BOOKING && (session ? (
-            <button onClick={() => { setOpen(false); handleLogout(); }}>Log out</button>
-          ) : (
-            <Link to="/login" onClick={() => setOpen(false)}>Log in</Link>
-          ))}
+          <a href="#about" onClick={() => setOpen(false)}>About</a>
+          <a href="#specialties" onClick={() => setOpen(false)}>Specialties</a>
+          <a href="#experience" onClick={() => setOpen(false)}>Experience</a>
+          <a href="#fees" onClick={() => setOpen(false)}>Sessions &amp; fees</a>
+          <a href="#book" onClick={() => setOpen(false)}>Book a session</a>
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
             <Instagram size={16} style={{ verticalAlign: "-3px", marginRight: 8 }} />
             Instagram

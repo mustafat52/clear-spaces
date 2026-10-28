@@ -56,6 +56,10 @@ export default function SiteNav() {
           <a href="#experience" onClick={() => setOpen(false)}>Experience</a>
           <a href="#fees" onClick={() => setOpen(false)}>Sessions &amp; fees</a>
           <a href="#book" onClick={() => setOpen(false)}>Book a session</a>
+          <a href={managerBookingLink()} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+            <MessageCircle size={16} style={{ verticalAlign: "-3px", marginRight: 8 }} />
+            Book on WhatsApp
+          </a>
           <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
             <Instagram size={16} style={{ verticalAlign: "-3px", marginRight: 8 }} />
             Instagram

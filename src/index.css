@@ -2393,3 +2393,97 @@ a.cs-btn {
   gap: 8px;
   justify-content: center;
 }
+
+/* ---------------- MOBILE POLISH ---------------- */
+.cs-nav-brand-text b,
+.cs-nav-brand-text span {
+  white-space: nowrap;
+}
+.cs-nav > div:last-child {
+  flex-shrink: 0;
+}
+.cs-nav-insta {
+  flex: 0 0 36px;
+}
+.cs-btn-wa {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cs-footer-top a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 860px) {
+  .cs-nav {
+    padding: 14px 20px;
+  }
+  /* a.cs-btn outranks .cs-nav-wa, so the earlier hide rule never applied */
+  a.cs-nav-wa {
+    padding: 9px 13px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .cs-nav .cs-nav-brand-text span {
+    display: none;
+  }
+  .cs-mobile-menu {
+    top: 76px;
+    overflow-y: auto;
+  }
+  .cs-witness-eye,
+  .cs-book-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .cs-book-icon {
+    width: 68px;
+    height: 68px;
+  }
+  .cs-hero-credentials span:not(:last-child)::after {
+    display: none;
+  }
+  .cs-hero-credentials span {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 4px 11px;
+    border-radius: 16px;
+  }
+  .cs-hero-credentials {
+    gap: 8px;
+  }
+  .cs-stat-row {
+    gap: 22px 28px;
+  }
+}
+@media (max-width: 540px) {
+  a.cs-nav-wa {
+    display: none; /* the hero and menu already offer booking */
+  }
+  .cs-nav-brand-text b {
+    font-size: 17px;
+  }
+  .cs-container {
+    padding: 0 20px;
+  }
+  .cs-hero-inner {
+    padding: 0 20px;
+  }
+  .cs-hero {
+    padding: 40px 0 64px;
+  }
+  .cs-book {
+    padding: 28px 18px;
+  }
+  .cs-btn-wa {
+    width: 100%;
+  }
+  .cs-hero-ctas .cs-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}

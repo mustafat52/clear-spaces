@@ -357,7 +357,7 @@ export default function Landing() {
       <section className="cs-section" id="experience">
         <div className="cs-container">
           <div className="cs-kicker">Experience &amp; credentials</div>
-          <h2 className="cs-h2">Trained, certified and practising since 2021</h2>
+          <h2 className="cs-h2">Trained, certified and practising since 2015</h2>
           <p className="cs-body-text" style={{ marginBottom: 34 }}>
             Munira Shakir is a integrative counsellor based in Secunderabad, with
             formal training in psychology and counselling from the Institute of Human Technology and a

@@ -221,7 +221,7 @@ export default function Landing() {
                 <span>Followers on Instagram</span>
               </div>
               <div className="cs-stat">
-                <b>354</b>
+                <b>367</b>
                 <span>Posts &amp; resources shared</span>
               </div>
             </div>

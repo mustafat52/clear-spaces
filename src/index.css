@@ -2486,3 +2486,206 @@ a.cs-btn {
     justify-content: center;
   }
 }
+
+/* ---------------- REVIEWS ---------------- */
+.cs-reviews-head {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.cs-reviews-head .cs-h2 {
+  max-width: none;
+  margin-bottom: 0;
+}
+.cs-rv {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.cs-rv-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--navy-deep), var(--navy) 55%, var(--blue));
+  color: #fff;
+  border-radius: 26px;
+  padding: 44px 52px 36px;
+  box-shadow: 0 22px 50px rgba(8, 31, 67, 0.3);
+  animation: cs-rv-in 0.45s ease;
+}
+.cs-rv-card::after {
+  content: "";
+  position: absolute;
+  right: -110px;
+  bottom: -130px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(1, 177, 253, 0.3), transparent 68%);
+  pointer-events: none;
+}
+@keyframes cs-rv-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.cs-rv-mark {
+  position: absolute;
+  top: 26px;
+  right: 34px;
+  color: var(--amber-soft);
+  opacity: 0.28;
+}
+.cs-rv-theme {
+  align-self: flex-start;
+  position: relative;
+  z-index: 1;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--amber-soft);
+  background: rgba(252, 200, 94, 0.14);
+  border: 1px solid rgba(252, 200, 94, 0.4);
+  padding: 5px 13px;
+  border-radius: 20px;
+}
+.cs-rv-card blockquote {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  margin: 22px 0 28px;
+  font-family: "Lora", Georgia, serif;
+  font-size: 22px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+.cs-rv-by {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+.cs-rv-avatar {
+  flex: 0 0 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--amber);
+  color: #33240a;
+  font-family: "Lora", Georgia, serif;
+  font-weight: 600;
+  font-size: 20px;
+}
+.cs-rv-by b {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+}
+.cs-rv-by small {
+  font-size: 12.5px;
+  color: #a9c6e6;
+}
+.cs-rv-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 22px;
+}
+.cs-rv-arrow {
+  flex: 0 0 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--navy);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(12, 43, 89, 0.1);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.cs-rv-arrow:hover {
+  background: var(--blue);
+  color: #fff;
+}
+.cs-rv-people {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cs-rv-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 5px 14px 5px 5px;
+  border-radius: 30px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-family: "Work Sans", sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cs-rv-person span {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--sky-pale);
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 13px;
+}
+.cs-rv-person em {
+  font-style: normal;
+  font-size: 13.5px;
+  color: var(--navy);
+}
+.cs-rv-person.active {
+  border-color: var(--blue);
+  box-shadow: 0 6px 16px rgba(1, 70, 199, 0.18);
+}
+.cs-rv-person.active span {
+  background: var(--blue);
+  color: #fff;
+}
+@media (max-width: 700px) {
+  .cs-rv-card {
+    padding: 30px 24px 26px;
+    min-height: 0;
+    border-radius: 22px;
+  }
+  .cs-rv-card blockquote {
+    font-size: 17px;
+    line-height: 1.65;
+  }
+  .cs-rv-mark {
+    width: 44px;
+    height: 44px;
+    top: 20px;
+    right: 20px;
+  }
+  .cs-rv-controls {
+    flex-wrap: wrap;
+  }
+  .cs-rv-people {
+    order: -1;
+    flex-basis: 100%;
+  }
+  .cs-rv-person em {
+    display: none;
+  }
+  .cs-rv-person {
+    padding: 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-rv-card {
+    animation: none;
+  }
+}

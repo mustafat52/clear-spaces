@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Check, Clock, CalendarCheck, Star, Package, Sparkles, Award, ChevronLeft, ChevronRight, Ghost, Zap, CloudLightning, HelpCircle, HeartCrack, Link2, Users, Briefcase, GraduationCap, ZoomIn, X, Eye, HeartHandshake, Layers, Compass, MessageCircle, Youtube, Instagram, LayoutDashboard } from "lucide-react";
+import { Check, Clock, Quote, CalendarCheck, Star, Package, Sparkles, Award, ChevronLeft, ChevronRight, Ghost, Zap, CloudLightning, HelpCircle, HeartCrack, Link2, Users, Briefcase, GraduationCap, ZoomIn, X, Eye, HeartHandshake, Layers, Compass, MessageCircle, Youtube, Instagram, LayoutDashboard } from "lucide-react";
 import Logo from "../components/Logo";
 import SiteNav from "../components/SiteNav";
 import { managerBookingLink } from "../lib/whatsapp";
@@ -112,6 +112,34 @@ const PACKAGE = {
   message: "Hello, I'd like to book the 5-Session Package (₹10,000) at Clearspaces.",
 };
 
+const REVIEWS = [
+  {
+    name: "Zainab",
+    theme: "Feeling numb & alone",
+    q: "When I first reached out, I was feeling numb, empty, and very alone. I had withdrawn from people and lost interest in everyday life. The support and understanding I received helped me slowly find myself again.",
+  },
+  {
+    name: "Shabbir",
+    theme: "Healthier habits",
+    q: "I used to scroll Instagram till 2–4 AM and turn to food whenever I felt low. Today, I have a much healthier relationship with both. These small changes have made a big difference.",
+  },
+  {
+    name: "Nafisa",
+    theme: "Showing up for myself",
+    q: "I've started showing up for myself again. Even something as simple as a morning walk feels meaningful now. I'm truly grateful to Munira ben for the guidance and safe space that made this change possible.",
+  },
+  {
+    name: "Aarti",
+    theme: "Rebuilding a relationship",
+    q: "We had reached a point where separation seemed inevitable. Years of misunderstandings had created distance between us. Therapy helped us understand each other, communicate better, and rebuild our relationship. We're truly grateful to Munira ben for helping us find our way back to each other.",
+  },
+  {
+    name: "Sarah B.",
+    theme: "Reconnecting as a couple",
+    q: "After our children grew up and became independent, we found ourselves feeling more like roommates than partners. The connection we once shared had slowly faded. Therapy helped us reconnect, rediscover our companionship, and enjoy being together again. It feels like a new beginning for us.",
+  },
+];
+
 const EXP_POINTS = [
   "Personalised therapy plans for individuals, couples, families, children and teenagers.",
   "Psychotherapy drawing on cognitive-behavioural, client-centred and play-therapy approaches.",
@@ -137,6 +165,17 @@ const EXP_SKILLS = [
 export default function Landing() {
   const [cert, setCert] = useState(null);
   const [activeCert, setActiveCert] = useState(0);
+  const [rv, setRv] = useState(0);
+  const [rvPaused, setRvPaused] = useState(false);
+  const [touchX, setTouchX] = useState(null);
+  const goRv = (i) => setRv((i + REVIEWS.length) % REVIEWS.length);
+
+  useEffect(() => {
+    if (rvPaused) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => setRv((i) => (i + 1) % REVIEWS.length), 9000);
+    return () => clearInterval(id);
+  }, [rvPaused, rv]);
 
   useEffect(() => {
     if (!cert) return;
@@ -606,38 +645,64 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="cs-section cs-section-soft">
+      <section className="cs-section cs-section-soft cs-reviews" id="reviews">
         <div className="cs-container">
-          <div className="cs-kicker">From past sessions</div>
-          <h2 className="cs-h2">What clients have shared</h2>
-          <div className="cs-quote-grid">
-            {[
-              {
-                q: "Therapy helped me feel understood and supported. I now handle stress much better.",
-                a: "Zainab",
-              },
-              {
-                q: "Counseling gave me the tools to manage my anxiety. I'm much happier now.",
-                a: "Shabbir",
-              },
-              {
-                q: "Talking to my psychologist changed my life. I finally feel at peace.",
-                a: "Nafisa",
-              },
-              {
-                q: "I learned how to cope with my emotions through therapy. It's made a big difference.",
-                a: "Aarti",
-              },
-              {
-                q: "Therapy gave me hope and helped me find my way again.",
-                a: "Sarah B.",
-              },
-            ].map((t) => (
-              <div className="cs-quote" key={t.a}>
-                <p>{t.q}</p>
-                <span>{t.a}</span>
+          <div className="cs-reviews-head">
+            <div className="cs-kicker">From past sessions</div>
+            <h2 className="cs-h2">What clients have shared</h2>
+          </div>
+
+          <div
+            className="cs-rv"
+            onMouseEnter={() => setRvPaused(true)}
+            onMouseLeave={() => setRvPaused(false)}
+            onFocus={() => setRvPaused(true)}
+            onBlur={() => setRvPaused(false)}
+            onTouchStart={(e) => setTouchX(e.touches[0].clientX)}
+            onTouchEnd={(e) => {
+              if (touchX === null) return;
+              const dx = e.changedTouches[0].clientX - touchX;
+              if (Math.abs(dx) > 45) goRv(rv + (dx < 0 ? 1 : -1));
+              setTouchX(null);
+            }}
+          >
+            <div className="cs-rv-card" key={rv} aria-live="polite">
+              <Quote className="cs-rv-mark" size={64} strokeWidth={1.5} />
+              <span className="cs-rv-theme">{REVIEWS[rv].theme}</span>
+              <blockquote>{REVIEWS[rv].q}</blockquote>
+              <div className="cs-rv-by">
+                <span className="cs-rv-avatar">{REVIEWS[rv].name.charAt(0)}</span>
+                <div>
+                  <b>{REVIEWS[rv].name}</b>
+                  <small>Shared after counselling at Clearspaces</small>
+                </div>
               </div>
-            ))}
+            </div>
+
+            <div className="cs-rv-controls">
+              <button type="button" className="cs-rv-arrow" aria-label="Previous review" onClick={() => goRv(rv - 1)}>
+                <ChevronLeft size={20} />
+              </button>
+              <div className="cs-rv-people" role="tablist" aria-label="Choose a review">
+                {REVIEWS.map((r, i) => (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={i === rv}
+                    aria-label={"Review by " + r.name}
+                    key={r.name}
+                    className={"cs-rv-person" + (i === rv ? " active" : "")}
+                    onClick={() => setRv(i)}
+                  >
+                    <span>{r.name.charAt(0)}</span>
+                    <em>{r.name}</em>
+                  </button>
+                ))}
+              </div>
+              <button type="button" className="cs-rv-arrow" aria-label="Next review" onClick={() => goRv(rv + 1)}>
+                <ChevronRight size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </section>

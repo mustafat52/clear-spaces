@@ -256,7 +256,7 @@ export default function Landing() {
                 <span>Cases handled</span>
               </div>
               <div className="cs-stat">
-                <b>14.9K</b>
+                <b>15K+</b>
                 <span>Followers on Instagram</span>
               </div>
               <div className="cs-stat">

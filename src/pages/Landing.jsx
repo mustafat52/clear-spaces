@@ -193,7 +193,7 @@ export default function Landing() {
           <div>
             <div className="cs-eyebrow-row">
               <div className="cs-eyebrow">
-                <Sparkles size={14} /> Trusted by a community of 14.9K+
+                <Sparkles size={14} /> Trusted by a community of 15.0K+
               </div>
               <div className="cs-eyebrow cs-eyebrow-amber">
                 <Award size={14} /> 1500+ cases handled
